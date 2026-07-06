@@ -1,0 +1,82 @@
+---
+title: Security Notes
+description: Admin surface, known limitations and hardening roadmap for the Biscotti protocol.
+---
+
+# Security Notes
+
+Biscotti is live on **ARC Testnet**. This page documents the current admin
+surface, known limitations, and what changes before mainnet. We believe
+honest documentation of trust assumptions is part of being enterprise-grade.
+
+:::warning[Testnet status]
+Contracts are unaudited and testnet-only. Do not deploy value you cannot
+afford to lose against these addresses.
+:::
+
+## Admin surface
+
+| Contract | Privileged capability | Holder |
+| --- | --- | --- |
+| `BiscottiToken` | `MINTER_ROLE` can mint up to the 1B cap; `DEFAULT_ADMIN_ROLE` manages roles | MasterChefs (minter); deployer (admin) |
+| `MasterChefERC20` | `add`/`set` pools, `updateEmissionRate` | Owner |
+| `MasterChefV3` | `add`/`set` pools, `upkeep` (mints BSCT) | Owner / operator |
+| `StableSwapFactory` | `createSwapPair` | Owner |
+| `StableSwapPool` | `ramp_A`, fee changes (two-step), `withdraw_admin_fees`, `kill_me` | Owner |
+| `CoffeePool` / `SmartChef` | Emission & window changes, reward recovery (never principal) | Pool admin |
+| `RewardDistributor` | `createEpoch`, `recoverUnclaimed` (post-deadline only) | Owner |
+
+### Invariants that hold regardless of admin
+
+- BSCT supply can never exceed 1,000,000,000.
+- Coffee/SmartChef owners cannot withdraw users' staked principal.
+- `RewardDistributor` cannot pay outside the published Merkle root, pay a
+  wallet twice per epoch, or recover funds before the claim deadline.
+- Stable pools' `kill_me` freezes trading but **balanced withdrawals remain
+  available** — LPs can always exit.
+- V3 pools and positions have no admin functions at all.
+
+## Known limitations
+
+### 1. `crossLmTick` not wired into V3 pools
+
+`MasterChefV3LmPool` expects the V3 pool to call `crossLmTick` on every tick
+cross during swaps. Stock Uniswap V3 has no such hook, so `lmLiquidity` only
+updates on deposits/withdrawals.
+
+**Effect:** a position that goes out of range between deposits keeps earning
+farm rewards as if in range. Total emissions never exceed the `upkeep`
+budget — this is a fairness skew between LPs, not inflation.
+
+**Fix path:** fork `v3-core` to add an LmPool hook in `swap()` (as done by
+other major V3 farms), redeploy the factory and migrate liquidity. Tracked
+for mainnet.
+
+### 2. `upkeep()` can over-mint if double-called
+
+Calling `upkeep()` before the previous period ends mints additional BSCT.
+Mitigated operationally by a keeper schedule; a contract-level guard is
+planned.
+
+### 3. No timelock on admin functions
+
+Owner keys act immediately. Before mainnet, ownership of both MasterChefs and
+the factories moves behind a multisig and timelock.
+
+## User-facing safety notes
+
+- **`emergencyWithdraw` forfeits rewards** on every farm and pool type — it
+  is an escape hatch, not a fast exit.
+- **Always set slippage bounds** (`amountOutMinimum`, `min_dy`,
+  `min_mint_amount`) when calling contracts directly; the app does this for
+  you.
+- **Approvals:** the router and farms only pull tokens via `transferFrom`
+  during your own transactions; still, prefer per-protocol allowances if you
+  interact with many dapps.
+
+## Reporting
+
+Found something? Contact the team on
+[Telegram](https://t.me/+3gVQE9ZzFecwYzY0) or open a private security
+advisory on [GitHub](https://github.com/biscottilabs). A formal bug-bounty
+program launches with mainnet — see the [Roadmap](/roadmap).

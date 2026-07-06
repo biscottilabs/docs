@@ -1,0 +1,83 @@
+---
+title: Analytics
+description: Protocol, pair and token analytics powered by open subgraphs.
+---
+
+# Analytics
+
+Biscotti's **Info** pages surface live protocol data — volume, TVL, pairs and
+tokens — all indexed from the chain by open-source subgraphs.
+
+## Info pages
+
+| Page | What it shows |
+| --- | --- |
+| **Info → Overview** | Protocol-wide TVL, 24h/7d volume, top pairs and tokens |
+| **Info → Pairs** | Per-pair volume, liquidity, fee APR and price charts |
+| **Info → Tokens** | Per-token price, volume, liquidity across all pools |
+
+Fee APRs shown on [Farms](/farms) and pool pages are derived from the same
+data:
+
+```
+feeAPR = 24h fees × 365 / TVL
+```
+
+## Subgraphs
+
+Two subgraphs index the protocol:
+
+### `exchange-analytics-arc`
+
+Indexes both AMMs — V3 pools and stable pools — into a unified schema:
+
+- swaps, mints, burns and collects per pool
+- hourly/daily aggregates for volume, fees and TVL
+- token-level derived prices
+
+Used by the Info pages, farm APRs and the pair/token detail charts.
+
+### `trading-battles-arc`
+
+Indexes eligible swaps for [Trading Battles](/trading-battles):
+
+- per-wallet volume within each season window
+- powers the live leaderboard and season finalization
+
+## Querying yourself
+
+Both subgraphs expose standard GraphQL endpoints. Example — top pairs by
+volume:
+
+```graphql
+{
+  pairDayDatas(
+    first: 10
+    orderBy: dailyVolumeUSD
+    orderDirection: desc
+    where: { date_gte: 1780000000 }
+  ) {
+    pairAddress
+    token0 { symbol }
+    token1 { symbol }
+    dailyVolumeUSD
+    reserveUSD
+  }
+}
+```
+
+:::info[Endpoints]
+Public subgraph endpoints for ARC Testnet are published in the app repository
+(`subgraphs/`). Mainnet endpoints will be listed here at launch.
+:::
+
+## On-chain data sources
+
+If you prefer reading state directly:
+
+| Data | Source |
+| --- | --- |
+| V3 pool state (price, liquidity, ticks) | `UniswapV3Pool.slot0()`, `TickLens` |
+| Stable pool state (balances, virtual price) | `StableSwapPool`, `InfoStableSwap` |
+| Farm emissions & stakes | `MasterChefERC20`, `MasterChefV3` (see [ABIs](/developers/abis)) |
+| Batch reads | `UniswapInterfaceMulticall` |

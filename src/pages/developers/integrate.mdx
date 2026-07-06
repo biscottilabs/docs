@@ -1,0 +1,153 @@
+---
+title: Integration Guide
+description: Quote and execute swaps, read pools and track farms from your own app or contracts.
+---
+
+# Integration Guide
+
+Everything you need to integrate Biscotti: quoting, swapping, reading pool
+state and tracking farm rewards. Examples use [viem](https://viem.sh), but any
+EVM tooling works. Addresses are in [Contract Addresses](/developers/addresses);
+minimal ABIs in [ABIs](/developers/abis).
+
+## Setup
+
+:::code-group
+
+```ts [client.ts (viem)]
+import { createPublicClient, defineChain, http } from 'viem'
+
+export const arcTestnet = defineChain({
+  id: 5042002,
+  name: 'ARC Testnet',
+  nativeCurrency: { name: 'USD Coin', symbol: 'USDC', decimals: 18 },
+  rpcUrls: { default: { http: [process.env.ARC_RPC_URL!] } },
+})
+
+export const client = createPublicClient({ chain: arcTestnet, transport: http() })
+```
+
+```bash [foundry (cast)]
+export RPC_URL=<arc-testnet-rpc>
+export CHAIN_ID=5042002
+```
+
+:::
+
+## Quoting
+
+### V3 quote (QuoterV2)
+
+`QuoterV2` simulates the swap — always call it with `eth_call`, never
+on-chain:
+
+```ts
+const { result } = await client.simulateContract({
+  address: QUOTER_V2,
+  abi: quoterV2Abi,
+  functionName: 'quoteExactInputSingle',
+  args: [{
+    tokenIn: USDC,
+    tokenOut: EURC,
+    amountIn: parseUnits('1000', 6),
+    fee: 500,
+    sqrtPriceLimitX96: 0n,
+  }],
+})
+const [amountOut] = result
+```
+
+### Stable quote (get_dy)
+
+```ts
+const amountOut = await client.readContract({
+  address: STABLE_POOL_USDC_EURC,
+  abi: stableSwapPoolAbi,
+  functionName: 'get_dy',
+  args: [0n, 1n, parseUnits('1000', 6)], // coin i → coin j
+})
+```
+
+Compare both quotes (and multi-hop paths) and route accordingly — this is
+exactly what the app's smart-router package does before encoding a
+[Smart Router](/smart-router) transaction.
+
+## Swapping
+
+```ts
+// One-time ERC-20 approval to the Smart Router
+await walletClient.writeContract({
+  address: USDC, abi: erc20Abi,
+  functionName: 'approve', args: [SMART_ROUTER, maxUint256],
+})
+
+// Single V3 hop
+await walletClient.writeContract({
+  address: SMART_ROUTER,
+  abi: smartRouterAbi,
+  functionName: 'exactInputSingle',
+  args: [{
+    tokenIn: USDC, tokenOut: EURC, fee: 500,
+    recipient: account.address,
+    amountIn: parseUnits('1000', 6),
+    amountOutMinimum: applySlippage(quote, 50), // 0.5%
+    sqrtPriceLimitX96: 0n,
+  }],
+})
+```
+
+For split/mixed routes, encode multiple legs into
+`multicall(deadline, bytes[])` — full example in
+[Smart Router](/smart-router#integration-example).
+
+## Reading pool state
+
+:::code-group
+
+```ts [V3 pool]
+const [sqrtPriceX96, tick] = await client.readContract({
+  address: POOL, abi: v3PoolAbi, functionName: 'slot0',
+})
+// price(token1/token0) = (sqrtPriceX96 / 2^96)^2, adjusted for decimals
+```
+
+```ts [Stable pool]
+const virtualPrice = await client.readContract({
+  address: STABLE_POOL, abi: stableSwapPoolAbi,
+  functionName: 'get_virtual_price',
+}) // 1e18 scale, only increases
+```
+
+:::
+
+## Tracking farm rewards
+
+```ts
+// Classic farm — pending BSCT
+const pending = await client.readContract({
+  address: MASTERCHEF_ERC20, abi: masterChefErc20Abi,
+  functionName: 'pendingBsctt', args: [0n, user],
+})
+
+// V3 farm — all staked positions, then pending per position
+const tokenIds = await client.readContract({
+  address: MASTERCHEF_V3, abi: masterChefV3Abi,
+  functionName: 'getUserTokenIds', args: [user],
+})
+const pendingV3 = await client.readContract({
+  address: MASTERCHEF_V3, abi: masterChefV3Abi,
+  functionName: 'pendingBsctt', args: [tokenIds[0]],
+})
+```
+
+## Batch reads
+
+Use the deployed `UniswapInterfaceMulticall`
+(`0x337361Dd8D8Ee27Ab5EfFec69412AC8B080d704a`) or viem's built-in
+`multicall` to aggregate reads in one RPC round-trip.
+
+## Historical data
+
+For volume, TVL and price history, query the
+[analytics subgraphs](/analytics#subgraphs) instead of replaying events
+yourself.

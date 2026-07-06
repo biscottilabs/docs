@@ -72,6 +72,57 @@ cast send $BISCOTTI_TOKEN \
   --rpc-url $RPC_URL --private-key $PRIVATE_KEY
 ```
 
+## Tokenomics
+
+BSCT follows a **mint-and-burn** model: emissions are minted continuously to
+reward the people who make the protocol work (liquidity providers and
+stakers), while protocol revenue buys back and burns BSCT — with the goal of
+burns outpacing emissions once trading volume matures.
+
+### Supply
+
+| | |
+| --- | --- |
+| Hard cap | 1,000,000,000 BSCT — enforced at the contract level |
+| Initial supply | Minimal — supply enters circulation through emissions, not a pre-mine |
+| Long-term target | **Net-deflationary**: weekly burns ≥ weekly emissions |
+
+### Emission allocation
+
+Emissions are directed where they create protocol value, weighted by
+governance-adjustable allocation points:
+
+| Destination | Share of emissions | Mechanism |
+| --- | --- | --- |
+| **V3 farms** (concentrated liquidity) | ~55% | `MasterChefV3.upkeep()` reward periods |
+| **Classic farms** (stable LP) | ~20% | `MasterChefERC20` per-block emissions |
+| **Coffee Pools & staking** | ~15% | Funded pool budgets |
+| **Ecosystem growth fund** | ~10% | Trading battles, partnerships, listings |
+
+Shares are indicative for the current testnet phase and will be ratified
+before mainnet; live values are always readable on-chain via allocation
+points (see [Farms](/farms)).
+
+### Deflationary mechanics (activating at mainnet)
+
+Protocol revenue funds a recurring **buy-back-and-burn**:
+
+- **Stable-pool admin fees** — 50% of every stable swap fee accrues to the
+  protocol and is used to buy back BSCT.
+- **Trading-battle entry surpluses and unclaimed rewards** — recovered after
+  each season's claim deadline.
+- **Weekly burn cadence** — burns are executed and published on a fixed
+  schedule so the burn rate is auditable.
+
+The long-run target is an annual **net supply reduction of ~4%**, with
+emission cuts phased in as fee revenue grows — emissions bootstrap liquidity
+early, revenue sustains rewards later.
+
+:::info[Emissions are already capped]
+Whatever the schedule, the 1B hard cap is enforced by the token contract —
+no minter, present or future, can exceed it.
+:::
+
 ## Utility
 
 | Use | Where |
@@ -79,3 +130,4 @@ cast send $BISCOTTI_TOKEN \
 | Farm rewards | [Farms](/farms) — emissions for LP and V3 position staking |
 | Coffee pool rewards | [Coffee Pools](/coffee-pools) — earned on staked tokens |
 | Trading battle prizes | [Trading Battles](/trading-battles) — Merkle-claimed season rewards |
+| Governance (planned) | Emission weights and burn parameters — see [Roadmap](/roadmap) |

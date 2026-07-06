@@ -1,0 +1,133 @@
+---
+title: ABIs
+description: Minimal human-readable ABIs for frontend and integrator use.
+---
+
+# ABIs
+
+Minimal human-readable ABIs for the protocol-specific contracts. Standard
+Uniswap V3 ABIs (`Factory`, `Pool`, `NonfungiblePositionManager`, `QuoterV2`)
+are available from the `@uniswap/v3-core` and `@uniswap/v3-periphery`
+packages. Full JSON artifacts live in the repo at `contract/out/`.
+
+## BiscottiSmartRouter
+
+```ts
+export const smartRouterAbi = [
+  'function multicall(uint256 deadline, bytes[] data) returns (bytes[] results)',
+  'function multicall(bytes[] data) returns (bytes[] results)',
+  'function exactInputSingle((address tokenIn, address tokenOut, uint24 fee, address recipient, uint256 amountIn, uint256 amountOutMinimum, uint160 sqrtPriceLimitX96)) returns (uint256 amountOut)',
+  'function exactInput((bytes path, address recipient, uint256 amountIn, uint256 amountOutMinimum)) returns (uint256 amountOut)',
+  'function exactInputStableSwap(address[] path, uint256[] flag, uint256 amountIn, uint256 amountOutMinimum, address to) returns (uint256 amountOut)',
+] as const
+```
+
+## MasterChefERC20
+
+```ts
+export const masterChefErc20Abi = [
+  'function poolLength() view returns (uint256)',
+  'function poolInfo(uint256) view returns (address lpToken, uint256 allocPoint, uint256 lastRewardBlock, uint256 accBscttPerShare)',
+  'function userInfo(uint256, address) view returns (uint256 amount, uint256 rewardDebt)',
+  'function pendingBsctt(uint256 pid, address user) view returns (uint256)',
+  'function totalAllocPoint() view returns (uint256)',
+  'function bscttPerBlock() view returns (uint256)',
+  'function deposit(uint256 pid, uint256 amount)',
+  'function withdraw(uint256 pid, uint256 amount)',
+  'function emergencyWithdraw(uint256 pid)',
+] as const
+```
+
+## MasterChefV3
+
+```ts
+export const masterChefV3Abi = [
+  'function poolLength() view returns (uint256)',
+  'function poolInfo(uint256) view returns (uint256 allocPoint, address v3Pool, address token0, address token1, uint24 fee, uint256 totalLiquidity, address lmPool)',
+  'function tokenIdPositions(uint256) view returns (uint128 liquidity, int24 tickLower, int24 tickUpper, uint256 rewardGrowthInside, uint256 reward, address user, uint256 pid)',
+  'function pendingBsctt(uint256 tokenId) view returns (uint256)',
+  'function getUserTokenIds(address user) view returns (uint256[])',
+  'function harvest(uint256 tokenId, address to) returns (uint256 reward)',
+  'function withdraw(uint256 tokenId, address to) returns (uint256 reward)',
+  'function v3PoolPid(address pool) view returns (uint256)',
+  'function totalAllocPoint() view returns (uint256)',
+  'function latestPeriod() view returns (uint256 rewardPerSecond, uint256 startTime, uint256 endTime)',
+] as const
+```
+
+## MasterChefV3LmPool
+
+Needed for V3 farm APR (active liquidity denominator):
+
+```ts
+export const lmPoolAbi = [
+  'function lmLiquidity() view returns (uint128)',
+  'function rewardGrowthGlobalX128() view returns (uint256)',
+  'function lastRewardTimestamp() view returns (uint32)',
+] as const
+```
+
+## StableSwapPool
+
+```ts
+export const stableSwapPoolAbi = [
+  'function coins(uint256 i) view returns (address)',
+  'function A() view returns (uint256)',
+  'function get_virtual_price() view returns (uint256)',
+  'function get_dy(uint256 i, uint256 j, uint256 dx) view returns (uint256)',
+  'function calc_token_amount(uint256[2] amounts, bool deposit) view returns (uint256)',
+  'function calc_withdraw_one_coin(uint256 _token_amount, uint256 i) view returns (uint256)',
+  'function exchange(uint256 i, uint256 j, uint256 dx, uint256 min_dy)',
+  'function add_liquidity(uint256[2] amounts, uint256 min_mint_amount)',
+  'function remove_liquidity(uint256 _amount, uint256[2] min_amounts)',
+  'function remove_liquidity_one_coin(uint256 _token_amount, uint256 i, uint256 min_amount)',
+] as const
+```
+
+## StableSwapFactory
+
+```ts
+export const stableSwapFactoryAbi = [
+  'function getPairInfo(address tokenA, address tokenB) view returns ((address swapContract, address token0, address token1, address LPContract))',
+] as const
+```
+
+## CoffeePool
+
+```ts
+export const coffeePoolAbi = [
+  'function stakedToken() view returns (address)',
+  'function rewardToken() view returns (address)',
+  'function rewardPerBlock() view returns (uint256)',
+  'function startBlock() view returns (uint256)',
+  'function endBlock() view returns (uint256)',
+  'function hasUserLimit() view returns (bool)',
+  'function poolLimitPerUser() view returns (uint256)',
+  'function userInfo(address) view returns (uint256 amount, uint256 rewardDebt)',
+  'function pendingReward(address _user) view returns (uint256)',
+  'function deposit(uint256 amount)',
+  'function withdraw(uint256 amount)',
+  'function emergencyWithdraw()',
+] as const
+```
+
+## RewardDistributor
+
+```ts
+export const rewardDistributorAbi = [
+  'function claim(uint256 epochId, uint256 amount, bytes32[] proof)',
+  'function claimMulti(uint256[] epochIds, uint256[] amounts, bytes32[][] proofs)',
+  'function isClaimed(uint256 epochId, address user) view returns (bool)',
+] as const
+```
+
+## BiscottiToken (BSCT)
+
+Standard ERC-20 + EIP-2612 `permit`, plus:
+
+```ts
+export const bscttAbi = [
+  'function mint(address to, uint256 amount)', // MINTER_ROLE only
+  'function hasRole(bytes32 role, address account) view returns (bool)',
+] as const
+```

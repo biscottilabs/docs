@@ -30,6 +30,8 @@ export default defineConfig({
         { text: 'Protocol Architecture', link: '/architecture' },
         { text: 'Quick Start', link: '/quick-start' },
         { text: 'BSCT Token', link: '/token' },
+        { text: 'Roadmap', link: '/roadmap', badge: { text: 'soon', variant: 'info' } },
+        { text: 'Team', link: '/team' },
       ],
     },
     {

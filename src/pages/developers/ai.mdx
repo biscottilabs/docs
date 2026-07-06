@@ -1,0 +1,73 @@
+---
+title: AI & llms.txt
+description: AI-friendly access to the Biscotti documentation — llms.txt and per-page Markdown.
+---
+
+# AI & llms.txt
+
+These docs are built to be consumed by AI tools as easily as by humans.
+
+## llms.txt
+
+The site publishes an [llms.txt](https://llmstxt.org) index — a
+machine-readable table of contents that lets LLMs and agents discover every
+page with titles and descriptions:
+
+```
+https://docs.biscotti.finance/llms.txt
+```
+
+## Per-page Markdown
+
+Every documentation page is also served as plain Markdown — append `.md` to
+any route:
+
+```
+https://docs.biscotti.finance/smart-router.md
+https://docs.biscotti.finance/developers/addresses.md
+```
+
+This gives agents clean, token-efficient content without HTML boilerplate.
+
+## Using the docs with your AI assistant
+
+:::code-group
+
+```text [Prompt example]
+Read https://docs.biscotti.finance/llms.txt, then use
+the relevant pages to write a script that quotes and
+executes a USDC→EURC swap through the BiscottiSmartRouter
+on ARC Testnet (chain 5042002).
+```
+
+```ts [Claude API]
+// Point web-search / fetch tools at the docs host and let
+// the model navigate from llms.txt.
+const res = await anthropic.messages.create({
+  model: 'claude-sonnet-5',
+  max_tokens: 2048,
+  messages: [{
+    role: 'user',
+    content: 'Using https://docs.biscotti.finance/llms.txt as the index, ...',
+  }],
+})
+```
+
+:::
+
+## Ground-truth sources
+
+For anything the docs don't cover, the protocol itself is open source:
+
+| Source | Contents |
+| --- | --- |
+| `contract/src/` | All Solidity sources |
+| `contract/deployments/arc-testnet.json` | Machine-readable addresses |
+| `subgraphs/` | Analytics & trading-battles subgraph schemas |
+
+:::tip
+When building an integration with an AI assistant, paste the
+[Contract Addresses](/developers/addresses) page and the relevant
+[ABI section](/developers/abis) into context — they are deliberately
+formatted to be copy-paste friendly.
+:::
