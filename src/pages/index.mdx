@@ -1,5 +1,70 @@
-# Welcome
+---
+title: Biscotti Finance
+description: A community-driven DEX on ARC — concentrated liquidity, stable pools, yield farms and on-chain trading battles.
+layout: minimal
+content:
+  width: full
+---
 
-Welcome to your new Vocs documentation site.
+import { HomePage, Cards, Card } from 'vocs'
 
-Get started by editing this page at `src/pages/index.mdx`.
+<HomePage.Root>
+  <HomePage.Tagline>Brew your DeFi. ☕</HomePage.Tagline>
+  <HomePage.Description>
+    Biscotti Finance is a community-driven DEX on the ARC network — swap with
+    deep liquidity across concentrated-liquidity and stable pools, earn BSCT in
+    farms and coffee pools, and compete in on-chain trading battles.
+  </HomePage.Description>
+  <HomePage.Buttons>
+    <HomePage.Button href="/introduction" variant="accent">Get started</HomePage.Button>
+    <HomePage.Button href="/developers/addresses">Contract addresses</HomePage.Button>
+    <HomePage.Button href="https://biscotti.finance">Launch app</HomePage.Button>
+  </HomePage.Buttons>
+</HomePage.Root>
+
+<div style={{ maxWidth: '1080px', margin: '2rem auto 0' }}>
+
+<Cards>
+  <Card
+    href="/concentrated-liquidity"
+    title="Concentrated Liquidity"
+    description="Uniswap V3-style pools with custom price ranges, NFT positions and multiple fee tiers."
+  />
+  <Card
+    href="/stable-pools"
+    title="Stable Pools"
+    description="Curve-style StableSwap pools for like-priced assets with ultra-low slippage."
+  />
+  <Card
+    href="/smart-router"
+    title="Smart Router"
+    description="One transaction, best execution — split routing across V3 and stable pools."
+  />
+  <Card
+    href="/farms"
+    title="Farms"
+    description="Stake V3 positions or LP tokens in MasterChef farms and earn BSCT emissions."
+  />
+  <Card
+    href="/coffee-pools"
+    title="Coffee Pools"
+    description="Single-token staking pools — stake one token, earn another over a fixed period."
+  />
+  <Card
+    href="/trading-battles"
+    title="Trading Battles"
+    description="Seasonal trading competitions with Merkle-verified on-chain reward claims."
+  />
+  <Card
+    href="/analytics"
+    title="Analytics"
+    description="Protocol, pair and token analytics powered by open subgraphs."
+  />
+  <Card
+    href="/developers/integrate"
+    title="Build on Biscotti"
+    description="Addresses, ABIs and integration guides for every protocol contract."
+  />
+</Cards>
+
+</div>
