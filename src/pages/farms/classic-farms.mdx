@@ -1,0 +1,132 @@
+---
+title: Classic Farms
+description: MasterChefERC20 — stake ERC-20 LP tokens (stable LP) and earn per-block BSCT emissions.
+---
+
+# Classic Farms
+
+`MasterChefERC20` is a per-block MasterChef for **fungible LP tokens** — today
+that means [stable-pool LP](/stable-pools), and any future classic AMM LP.
+
+| | |
+| --- | --- |
+| Contract | `MasterChefERC20` — `0x70b9144e1378d872063d2BBfCA61f378A9b2d163` |
+| Stake | ERC-20 LP tokens (`StableSwapLP`) |
+| Rewards | BSCT, minted per block |
+
+## Reward model
+
+Every block, the farm mints `bscttPerBlock` BSCT and splits it across pools by
+allocation points:
+
+```
+poolRewardPerBlock = bscttPerBlock × pool.allocPoint / totalAllocPoint
+accBscttPerShare  += poolRewardPerBlock × 1e12 / lpSupply
+pending            = user.amount × accBscttPerShare / 1e12 − user.rewardDebt
+```
+
+Your share of a pool's emissions equals your share of its staked LP supply.
+
+## Using a farm
+
+::::steps
+
+### Approve
+
+Approve the LP token to the MasterChef once:
+
+```ts
+await lpToken.write.approve([MASTERCHEF_ERC20, maxUint256])
+```
+
+### Deposit
+
+```solidity
+function deposit(uint256 pid, uint256 amount) external nonReentrant;
+```
+
+Depositing also harvests any pending BSCT automatically.
+
+### Harvest
+
+Deposit **zero** to claim rewards without changing your stake:
+
+```ts
+await masterChef.write.deposit([pid, 0n]) // harvest-only pattern
+```
+
+### Withdraw
+
+```solidity
+function withdraw(uint256 pid, uint256 amount) external nonReentrant;
+```
+
+Withdrawal also harvests pending rewards.
+
+::::
+
+:::warning[Emergency exit]
+`emergencyWithdraw(pid)` returns your LP immediately but **forfeits all
+pending BSCT**. Only for emergencies.
+:::
+
+## Contract interface
+
+### Structs
+
+```solidity
+struct PoolInfo {
+    IERC20  lpToken;          // staked LP token
+    uint256 allocPoint;       // weight vs other pools
+    uint256 lastRewardBlock;
+    uint256 accBscttPerShare; // scaled by 1e12
+}
+
+struct UserInfo {
+    uint256 amount;      // LP staked
+    uint256 rewardDebt;  // harvest checkpoint
+}
+```
+
+### User & view functions
+
+```solidity
+function deposit(uint256 pid, uint256 amount) external nonReentrant;
+function withdraw(uint256 pid, uint256 amount) external nonReentrant;
+function emergencyWithdraw(uint256 pid) external nonReentrant;
+
+function pendingBsctt(uint256 pid, address user) external view returns (uint256);
+function poolLength() external view returns (uint256);
+function poolInfo(uint256 pid) external view returns (PoolInfo memory);
+function userInfo(uint256 pid, address user) external view returns (UserInfo memory);
+```
+
+### Admin functions
+
+```solidity
+/// Add a new LP pool. Always pass withUpdate=true in production.
+function add(uint256 allocPoint, IERC20 lpToken, bool withUpdate) external onlyOwner;
+
+/// Re-weight a pool
+function set(uint256 pid, uint256 allocPoint, bool withUpdate) external onlyOwner;
+
+/// Change the global emission rate
+function updateEmissionRate(uint256 bscttPerBlock) external onlyOwner;
+```
+
+## APR calculation
+
+```
+farmAPR = bscttPerBlock × blocksPerYear × (allocPoint / totalAllocPoint) × bscttPrice
+        ──────────────────────────────────────────────────────────────────────────────
+        stakedLpSupply × lpTokenPrice
+```
+
+For stable LP, `lpTokenPrice ≈ virtualPrice × pegPrice` — see
+[Providing Liquidity](/stable-pools/providing-liquidity#how-value-accrues-virtual-price).
+
+## Live classic farms — ARC Testnet
+
+| pid | LP | Alloc points |
+| --- | --- | --- |
+| 0 | USDC/EURC stable LP — `0x225057406e3C7D3f3196EC13fC82ed04E2D647Dd` | 100 |

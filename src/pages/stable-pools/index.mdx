@@ -1,0 +1,86 @@
+---
+title: Stable Pools
+description: Curve-style StableSwap pools on Biscotti — near-zero slippage for like-priced assets.
+---
+
+# Stable Pools
+
+Stable pools are Biscotti's second AMM: two-coin **StableSwap** pools built
+for assets that should trade near parity — stablecoin pairs like USDC/EURC,
+or wrapped/liquid-staked variants of the same asset.
+
+## Why a different curve?
+
+A constant-product AMM (`x·y = k`) always charges slippage, even when both
+assets are worth $1. The StableSwap invariant blends a constant-*sum* curve
+(zero slippage) with a constant-product curve (guaranteed liquidity at any
+price):
+
+```
+A·n^n·Σxᵢ + D = A·D·n^n + D^(n+1) / (n^n·Πxᵢ)
+```
+
+- `D` — the invariant: total value of the pool when balanced
+- `A` — the **amplification coefficient**: how strongly the pool behaves like
+  a constant-sum curve near the peg
+- `n = 2` — number of coins in a Biscotti pool
+
+While the pool is balanced, swaps execute almost 1:1. If one side is drained,
+the curve smoothly degrades toward constant-product pricing, so the pool never
+runs out of either asset.
+
+```
+price
+  │  constant-product (x·y=k)
+  │      ╲
+  │       ╲            StableSwap (high A)
+  │        ╲       ────────────────────
+ 1├─────────╲─────╱────────────────────╲─────
+  │          ╲___╱                      ╲___
+  │
+  └──────────────────────────────────────────▶
+                 pool balance ratio
+```
+
+### Amplification in practice
+
+Biscotti's deployed pools use `A = 200`. Higher `A` = flatter curve = lower
+slippage near the peg, but sharper price movement if the pool becomes very
+imbalanced. `A` can be ramped gradually by governance
+(`ramp_A`), never jumped instantly.
+
+## Fees
+
+| Parameter | Value (USDC/EURC pool) | Notes |
+| --- | --- | --- |
+| Swap fee | `4000000` = **0.04%** | Denominator `1e10`; max 0.5% |
+| Admin fee | `5000000000` = **50% of the swap fee** | Protocol's share; remainder compounds for LPs |
+
+Effective LP earnings: 0.02% of every swap compounds directly into the pool
+balance (there is no separate claim step for stable-pool fees).
+
+## LP tokens
+
+Each pool has a companion `StableSwapLP` ERC-20. Unlike
+[concentrated liquidity](/concentrated-liquidity) NFTs, stable LP tokens are
+fungible — deposit any mix of the two coins and receive LP tokens
+proportional to the value you added.
+
+Stake the LP token in a [classic farm](/farms/classic-farms) to earn BSCT on
+top of swap fees.
+
+## Deployed pools — ARC Testnet
+
+| Pool | Swap contract | LP token |
+| --- | --- | --- |
+| USDC/EURC | `0xBB9d51F97CA9553A0D1463c88173603a140E0E3f` | `0x225057406e3C7D3f3196EC13fC82ed04E2D647Dd` |
+
+Infrastructure addresses (factory, router, info helper) are in the
+[Contract Reference](/stable-pools/contracts).
+
+## Learn more
+
+- [Providing Liquidity](/stable-pools/providing-liquidity) — deposit, withdraw
+  and the virtual price
+- [Creating a Pool](/stable-pools/creating-a-pool) — how new pairs are added
+- [Contract Reference](/stable-pools/contracts) — full on-chain API

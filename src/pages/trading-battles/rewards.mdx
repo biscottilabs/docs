@@ -1,0 +1,111 @@
+---
+title: Trading Battles — Rewards & Claims
+description: The RewardDistributor Merkle contract and the season claim flow.
+---
+
+# Rewards & Claims
+
+Season rewards are settled by `RewardDistributor` — a Merkle-tree distributor
+that makes payouts publicly verifiable and one-time per wallet.
+
+## Deployment — ARC Testnet
+
+| Field | Value |
+| --- | --- |
+| `RewardDistributor` | `0x3dfdaa44C15094d2D844bF3aCE9E8eE4F5F8332E` |
+| Reward token (current) | BSCT — `0x6AD77e153f6D4Dd7c0F2e194A385e625274dE794` |
+| Deploy tx | `0xc5ccf1a763a178608d21aab122fca69d12fc5e9746d7640a81e46f11ba99db9b` |
+| Deploy block | `45931665` |
+
+## Epoch lifecycle
+
+```
+   Backend                          RewardDistributor                Trader
+      │                                     │                          │
+      │ 1. finalize leaderboard             │                          │
+      │ 2. compute wallet → amount          │                          │
+      │ 3. build Merkle tree                │                          │
+      │    leaf = keccak256(wallet‖amount)  │                          │
+      │ 4. transfer totalReward ───────────▶│                          │
+      │ 5. createEpoch(root, total,         │                          │
+      │       startTime, deadline) ────────▶│                          │
+      │                                     │◀── claim(epoch, amount,  │
+      │ 6. serve amount + proof ────────────┼────── proof) ────────────│
+      │                                     │─── transfer reward ─────▶│
+```
+
+Leaves are `keccak256(abi.encodePacked(wallet, amount))` over a sorted tree.
+
+## Contract interface
+
+### Owner functions
+
+```solidity
+/// Publish a season's rewards. The contract must already hold totalReward.
+function createEpoch(
+    bytes32 merkleRoot,
+    uint256 totalReward,
+    uint256 startTime,   // claims open
+    uint256 deadline     // claims close
+) external onlyOwner;
+
+/// After the deadline, sweep whatever was never claimed.
+function recoverUnclaimed(uint256 epochId) external onlyOwner;
+```
+
+### User functions
+
+```solidity
+/// Claim your allocation for one epoch.
+/// Reverts if: outside [startTime, deadline], already claimed, or bad proof.
+function claim(uint256 epochId, uint256 amount, bytes32[] calldata proof)
+    external nonReentrant;
+
+/// Claim several epochs in one transaction (e.g. missed seasons).
+function claimMulti(
+    uint256[] calldata epochIds,
+    uint256[] calldata amounts,
+    bytes32[][] calldata proofs
+) external nonReentrant;
+
+/// Has this wallet claimed epoch `epochId`?
+function isClaimed(uint256 epochId, address user) external view returns (bool);
+```
+
+## Claiming from a frontend
+
+```ts
+// 1. Fetch your allocation + proof from the trading-battles API
+const { epochId, amount, proof } = await fetch(
+  `${API}/battles/claims/${season}/${account.address}`
+).then(r => r.json())
+
+// 2. Claim on-chain
+await walletClient.writeContract({
+  address: REWARD_DISTRIBUTOR,
+  abi: rewardDistributorAbi,
+  functionName: 'claim',
+  args: [epochId, BigInt(amount), proof],
+})
+```
+
+:::tip[Verify independently]
+Because the Merkle root is on-chain, anyone can rebuild the tree from the
+published season results and verify their allocation without trusting the
+API.
+:::
+
+## Guarantees & limits
+
+| Property | Enforced by |
+| --- | --- |
+| One claim per wallet per epoch | On-chain `isClaimed` bitmap |
+| Payouts match published allocations | Merkle proof against the epoch root |
+| Total payout ≤ funded amount | Contract balance per epoch |
+| Claims window | `startTime` / `deadline` checks |
+| Unclaimed recovery | Owner-only, **only after deadline** |
+
+The trust assumption is at the *allocation* step: the leaderboard and reward
+math are computed off-chain by the backend before the root is published. The
+subgraph (`trading-battles-arc`) is open source, so allocations are
+reproducible.

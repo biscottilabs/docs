@@ -1,0 +1,83 @@
+---
+title: Creating a Stable Pool
+description: How new stable pools are deployed through the StableSwapFactory.
+---
+
+# Creating a Stable Pool
+
+Stable pools are created through the `StableSwapFactory`, which deploys the
+swap contract and its LP token in one transaction and registers the pair for
+the [Smart Router](/smart-router).
+
+:::note[Permissioned creation]
+`createSwapPair` is `onlyOwner` — new stable pools are curated by the
+protocol team. This is deliberate: a stable pool with a badly chosen `A` or a
+non-pegged pair gives LPs a false sense of safety. Want a pair listed? Reach
+out on [Telegram](https://t.me/+3gVQE9ZzFecwYzY0).
+:::
+
+## Factory flow
+
+```
+createSwapPair(tokenA, tokenB, A, fee, admin_fee)
+        │
+        ├── sorts tokens (t0 < t1), rejects existing pairs
+        ├── StableSwapLPFactory.createSwapLP()     → LP token (ERC-20)
+        ├── StableSwapPoolDeployer.createSwapPair() → StableSwapPool
+        └── registers pairInfo[t0][t1] = { swapContract, token0, token1, LP }
+```
+
+## Parameters
+
+| Parameter | Deployed value (USDC/EURC) | Constraint |
+| --- | --- | --- |
+| `_A` — amplification | `200` | `< 1,000,000` |
+| `_fee` — swap fee | `4000000` (0.04%) | `≤ 5e9` (0.5%), denominator `1e10` |
+| `_admin_fee` — protocol share of the fee | `5000000000` (50%) | `≤ 1e10` (100%) |
+
+## Create a pool (owner)
+
+```bash
+cast send $STABLE_SWAP_FACTORY \
+  "createSwapPair(address,address,uint256,uint256,uint256)" \
+  $TOKEN_A $TOKEN_B 200 4000000 5000000000 \
+  --rpc-url $RPC_URL --private-key $PRIVATE_KEY
+```
+
+## Look up a deployed pool
+
+```bash
+cast call $STABLE_SWAP_FACTORY \
+  "getPairInfo(address,address)(address,address,address,address)" \
+  $TOKEN_A $TOKEN_B \
+  --rpc-url $RPC_URL
+```
+
+Returns `(swapContract, token0, token1, lpToken)` regardless of the argument
+order you pass.
+
+## After creation
+
+::::steps
+
+### Seed liquidity
+
+The first `add_liquidity` must deposit **both** coins to establish the
+balance.
+
+### Register a farm (optional)
+
+Add the LP token to [MasterChefERC20](/farms/classic-farms) so LPs earn BSCT:
+
+```bash
+cast send $MASTERCHEF_ERC20 "add(uint256,address,bool)" \
+  100 $LP_TOKEN true \
+  --rpc-url $RPC_URL --private-key $PRIVATE_KEY
+```
+
+### Router picks it up automatically
+
+The Smart Router resolves stable pools from the factory on-chain — no router
+change is needed for a new pair.
+
+::::

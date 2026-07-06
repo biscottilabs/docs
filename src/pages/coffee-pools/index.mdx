@@ -1,0 +1,86 @@
+---
+title: Coffee Pools
+description: Single-token staking on Biscotti — stake one token, earn another over a fixed period.
+---
+
+# Coffee Pools ☕
+
+Coffee Pools are Biscotti's simplest way to earn: **stake a single token, earn
+another**. No LP tokens, no price ranges, no impermanent loss — just deposit
+and harvest.
+
+| | |
+| --- | --- |
+| Factory | `CoffeePoolFactory` — `0x7F60DcB5C141EC03650469210A4C936aFbe5619F` |
+| Pool contract | `CoffeePool` (one per campaign) |
+| Typical setup | Stake USDC → earn BSCT |
+
+## How they work
+
+Each Coffee Pool is configured with:
+
+- a **staked token** (what you deposit),
+- a **reward token** (what you earn),
+- a **reward per block**, and
+- a fixed **start / end block** window.
+
+Rewards stream per block to stakers proportionally to their share of the
+pool:
+
+```
+your reward rate = rewardPerBlock × yourStake / totalStaked
+```
+
+Some pools set a **per-wallet stake cap** (`poolLimitPerUser`) so early whales
+can't absorb the whole reward budget.
+
+## Using a Coffee Pool
+
+::::steps
+
+### Pick a pool
+
+The **Earn → Coffee Pools** page lists active pools with their APR, remaining
+duration and any wallet cap.
+
+### Stake
+
+Approve the staked token once, then deposit. Depositing also harvests any
+rewards you've already earned.
+
+### Harvest anytime
+
+Deposit `0` or withdraw `0` to claim rewards without touching your stake.
+Rewards don't compound automatically.
+
+### Withdraw
+
+Withdraw part or all of your stake at any time — there is no lock-up.
+Withdrawal harvests pending rewards in the same transaction.
+
+::::
+
+:::warning[Pools end]
+Rewards stop at the pool's `endBlock`. Your stake stays safe and withdrawable
+forever, but it earns nothing after the end — check the countdown in the app.
+:::
+
+## APR
+
+```
+APR = rewardPerBlock × blocksPerYear × rewardTokenPrice
+      ─────────────────────────────────────────────────
+      totalStaked × stakedTokenPrice
+```
+
+APR falls as more tokens are staked — early stakers in a fresh pool earn the
+most.
+
+## Live pools — ARC Testnet
+
+| Pool | Stake | Earn | Reward/block |
+| --- | --- | --- | --- |
+| #1 — `0x58a66E62f38d2b897A3337F2298bD111c29e09FD` | USDC | BSCT | 0.01 BSCT |
+| #2 — `0xfdE503599321AFAE57f287EC02E5F4a94a9f37D3` | USDC | BSCT | ~0.00177 BSCT |
+
+Full contract API in the [Coffee Pools Reference](/coffee-pools/contracts).

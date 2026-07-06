@@ -1,0 +1,61 @@
+---
+title: Trading Battles
+description: Seasonal trading competitions on Biscotti with on-chain, Merkle-verified reward claims.
+---
+
+# Trading Battles ⚔️
+
+Trading Battles are Biscotti's seasonal trading competitions. Trade eligible
+pairs during a season, climb the leaderboard, and claim your share of the
+prize pool on-chain when the season closes.
+
+## How a season works
+
+::::steps
+
+### Trade
+
+Every swap on eligible pairs during the season window counts. Volume is
+indexed automatically by the `trading-battles-arc` subgraph — no registration,
+no opt-in transaction.
+
+### Climb the leaderboard
+
+The **Trading Battles** page shows the live leaderboard and your current rank.
+Rankings are computed from indexed swap volume.
+
+### Season finalizes
+
+When the season ends, the backend freezes the leaderboard, computes each
+wallet's reward, and publishes the result as a **Merkle root** on the
+[`RewardDistributor`](/trading-battles/rewards) contract.
+
+### Claim
+
+Open the season's claim page; the API serves your amount and Merkle proof,
+and you claim directly from the contract — one transaction, trustlessly
+verifiable against the published root.
+
+::::
+
+## Design principles
+
+- **No registration contract.** Eligibility comes from indexed swaps, keeping
+  participation free and automatic.
+- **On-chain settlement.** Rewards live in the `RewardDistributor`; the
+  backend can decide *allocations*, but it cannot pay anyone outside the
+  Merkle tree, pay twice, or change an epoch after publishing.
+- **One claim per wallet per epoch.** Enforced on-chain.
+- **Deadline + recovery.** Unclaimed rewards can be recovered by the protocol
+  after the season's claim deadline and rolled into future seasons.
+
+## Reward tokens
+
+Seasons pay out in **BSCT** (protocol rewards) or **USDC** (stable,
+easy-to-value prizes) — each epoch specifies its token when it is created.
+
+## Where to find it
+
+- Live leaderboard & history: **Trading Battles** in the app
+- Top traders: all-time rankings across seasons
+- Claim mechanics & contract API: [Rewards & Claims](/trading-battles/rewards)

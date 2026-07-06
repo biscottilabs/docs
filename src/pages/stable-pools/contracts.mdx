@@ -1,0 +1,131 @@
+---
+title: Stable Pools — Contract Reference
+description: StableSwap contract addresses and full on-chain API.
+---
+
+# Contract Reference [Stable Pools]
+
+## Addresses — ARC Testnet
+
+| Contract | Address |
+| --- | --- |
+| `StableSwapFactory` | `0xD189F0A710C5BaDbd19d928f7c3aC3234d216C10` |
+| `StableSwapPoolDeployer` | `0x95303373868314fEace7976b7c5E4d4703bB95c2` |
+| `StableSwapLPFactory` | `0x96e7Ae6289d885EdCeA9954ed6Be84A6fbA0b20e` |
+| `StableSwapRouter` | `0xBb7CFA247037d2566Aabba748011e1fb630E43DF` |
+| `InfoStableSwap` | `0x4fe58d8a81115bBcb4F64e0eE3203073DD0da2f2` |
+| USDC/EURC `StableSwapPool` | `0xBB9d51F97CA9553A0D1463c88173603a140E0E3f` |
+| USDC/EURC `StableSwapLP` | `0x225057406e3C7D3f3196EC13fC82ed04E2D647Dd` |
+
+:::note[ARC Mainnet]
+Mainnet contracts — **coming soon**.
+:::
+
+## StableSwapPool
+
+One instance per pair. Two coins (`N_COINS = 2`), Curve-style math with
+amplification. Source: `src/stableswap/StableSwapPool.sol`.
+
+### Constants
+
+```solidity
+uint256 public constant N_COINS = 2;
+uint256 public constant FEE_DENOMINATOR = 1e10;
+uint256 public constant PRECISION = 1e18;
+uint256 public constant MAX_FEE = 5e9;        // 0.5%
+uint256 public constant MAX_ADMIN_FEE = 1e10; // 100% of the fee
+uint256 public constant MAX_A = 1e6;
+```
+
+### Views
+
+```solidity
+/// Coin address at index i (0 or 1)
+function coins(uint256 i) external view returns (address);
+
+/// Current amplification coefficient
+function A() external view returns (uint256);
+
+/// Value of 1 LP token in invariant terms (1e18) — monotonically increasing
+function get_virtual_price() external view returns (uint256);
+
+/// Output amount for swapping dx of coin i into coin j (fee included)
+function get_dy(uint256 i, uint256 j, uint256 dx)
+    external view returns (uint256);
+
+/// LP tokens minted (deposit=true) or burned (false) for given amounts
+function calc_token_amount(uint256[2] memory amounts, bool deposit)
+    external view returns (uint256);
+
+/// Preview single-sided withdrawal
+function calc_withdraw_one_coin(uint256 _token_amount, uint256 i)
+    external view returns (uint256);
+
+/// Accrued admin fees for coin i
+function admin_balances(uint256 i) external view returns (uint256);
+```
+
+### Trading & liquidity
+
+```solidity
+/// Swap dx of coin i for coin j; reverts if output < min_dy
+function exchange(uint256 i, uint256 j, uint256 dx, uint256 min_dy) external;
+
+function add_liquidity(uint256[2] memory amounts, uint256 min_mint_amount) external;
+function remove_liquidity(uint256 _amount, uint256[2] memory min_amounts) external;
+function remove_liquidity_imbalance(uint256[2] memory amounts, uint256 max_burn_amount) external;
+function remove_liquidity_one_coin(uint256 _token_amount, uint256 i, uint256 min_amount) external;
+```
+
+### Admin (owner only)
+
+```solidity
+/// Gradually ramp amplification (≤ 10× per ramp, time-bounded)
+function ramp_A(uint256 _future_A, uint256 _future_time) external onlyOwner;
+function stop_rampget_A() external onlyOwner;
+
+/// Two-step fee change
+function commit_new_fee(uint256 new_fee, uint256 new_admin_fee) external onlyOwner;
+function apply_new_fee() external onlyOwner;
+
+function withdraw_admin_fees() external onlyOwner;
+
+/// Emergency: freezes exchange/add; balanced remove_liquidity stays available
+function kill_me() external onlyOwner;
+function unkill_me() external onlyOwner;
+```
+
+## StableSwapFactory
+
+Registry + deployer entry point. See
+[Creating a Pool](/stable-pools/creating-a-pool).
+
+```solidity
+struct SwapPairInfo {
+    address swapContract;
+    address token0;
+    address token1;
+    address LPContract;
+}
+
+function createSwapPair(
+    address tokenA, address tokenB,
+    uint256 _A, uint256 _fee, uint256 _admin_fee
+) external onlyOwner;
+
+function getPairInfo(address tokenA, address tokenB)
+    external view returns (SwapPairInfo memory);
+```
+
+## StableSwapRouter & InfoStableSwap
+
+- `StableSwapRouter` — standalone router for stable-only swaps. Most
+  integrations should use the [Smart Router](/smart-router) instead, which
+  routes across both AMMs.
+- `InfoStableSwap` — read-only helper that batches pool balances, fees and LP
+  supplies for UIs and indexers.
+
+## StableSwapLP
+
+Minimal ERC-20 minted/burned exclusively by its pool. Stake it in
+[classic farms](/farms/classic-farms) to earn BSCT.

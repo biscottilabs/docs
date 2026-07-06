@@ -1,0 +1,128 @@
+---
+title: V3 Farms
+description: MasterChefV3 — stake concentrated-liquidity NFTs and earn BSCT weighted by liquidity.
+---
+
+# V3 Farms
+
+`MasterChefV3` pays BSCT to staked **concentrated-liquidity positions**. You
+deposit the position NFT itself; rewards accrue to your position's liquidity
+using the same tick-level accounting Uniswap V3 uses for fees.
+
+| | |
+| --- | --- |
+| Contract | `MasterChefV3` — `0x1CeD910a74d42D7A6972dEdEA1116a392Cd94A8D` |
+| Companion | One `MasterChefV3LmPool` per incentivized V3 pool |
+| Stake | `NonfungiblePositionManager` NFTs |
+| Rewards | BSCT, minted via `upkeep()` reward periods |
+
+## Staking a position
+
+Depositing is a plain NFT transfer — the farm implements `IERC721Receiver`:
+
+```solidity
+// From your wallet:
+nonfungiblePositionManager.safeTransferFrom(you, masterChefV3, tokenId);
+```
+
+Under the hood the farm:
+
+1. decodes the position (`token0`, `token1`, `fee`, `tickLower`, `tickUpper`, `liquidity`),
+2. resolves the pool's farm pid via `v3PoolPid[pool]`,
+3. checkpoints the LmPool's global reward growth,
+4. snapshots `rewardGrowthInside` for your range, and
+5. registers your liquidity in the LmPool's tick accounting.
+
+Withdrawing (`withdraw(tokenId, to)`) harvests pending BSCT and returns the
+NFT in one call.
+
+## Reward model
+
+### Funding: reward periods
+
+An operator periodically calls:
+
+```solidity
+/// Mints `totalReward` BSCT into the farm and streams it over `duration`
+function upkeep(uint256 totalReward, uint256 duration) external onlyOwnerOrOperator;
+```
+
+```
+rewardPerSecond = totalReward × 1e12 / duration
+```
+
+### Distribution: allocation points → liquidity share
+
+Each pool receives a slice weighted by its allocation points:
+
+```
+poolRewardPerSecond = rewardPerSecond × pool.allocPoint / totalAllocPoint
+```
+
+Within a pool, the LmPool spreads rewards across deposited liquidity using
+Q128 reward-growth accounting (mirroring V3 fee growth):
+
+```
+rewardGrowthGlobalX128 += duration × poolRewardPerSecond / 1e12 × Q128 / lmLiquidity
+pending = position.liquidity × (growthInsideNow − growthInsideSnapshot) / Q128
+```
+
+More liquidity in the pool → each unit earns less; concentrated positions
+(more liquidity per dollar) earn proportionally more.
+
+:::info[Known limitation: out-of-range positions]
+Stock Uniswap V3 pools do not call the LmPool's `crossLmTick` hook during
+swaps, so `lmLiquidity` only updates on deposits and withdrawals. If price
+moves out of your range between deposits, the position keeps earning as if in
+range. Total emissions never exceed the `upkeep` budget — the effect is a
+mild fairness skew, not inflation. A pool-level fix is on the roadmap; see
+[Security Notes](/developers/security).
+:::
+
+## User functions
+
+```solidity
+/// Claim pending BSCT for one position
+function harvest(uint256 tokenId, address to)
+    external nonReentrant returns (uint256 reward);
+
+/// Harvest + return the NFT
+function withdraw(uint256 tokenId, address to) external nonReentrant;
+
+/// Pending BSCT simulated up to the current timestamp
+function pendingBsctt(uint256 tokenId) external view returns (uint256);
+
+/// All position tokenIds a user has staked
+function getUserTokenIds(address user) external view returns (uint256[] memory);
+```
+
+## Admin functions
+
+```solidity
+/// Register a V3 pool for rewards — deploys its LmPool
+function add(uint256 allocPoint, IUniswapV3Pool v3Pool, bool withUpdate)
+    external onlyOwner returns (address lmPool);
+
+/// Re-weight an existing pool
+function set(uint256 pid, uint256 allocPoint, bool withUpdate) external onlyOwner;
+```
+
+## APR calculation (frontend/integrators)
+
+```
+farmAPR = poolRewardPerSecond × secondsPerYear × bscttPrice
+        ─────────────────────────────────────────────────────
+        totalStakedLiquidityValue
+```
+
+Read `latestPeriod()` for `rewardPerSecond`/`endTime`, `poolInfo(pid)` for
+`allocPoint` and `totalLiquidity`, and the LmPool's `lmLiquidity` for the
+active denominator. Minimal ABIs are in [ABIs](/developers/abis).
+
+## Live V3 farms — ARC Testnet
+
+| pid | Pool | Fee | LmPool |
+| --- | --- | --- | --- |
+| 0 | USDC/EURC — `0x6b15920Aec9700dFe3Ca2C25343059fbF91769A0` | 0.05% | `0x4b0dDE0d6E609A79797A50667161cA453DF0197F` |
+
+Current reward period: 10,000 BSCT over 7 days.

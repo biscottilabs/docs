@@ -1,0 +1,60 @@
+---
+title: SmartChef Pools
+description: Factory-deployed single-asset staking pools — stake token A, earn token B.
+---
+
+# SmartChef Pools
+
+SmartChef is a factory pattern for launching **single-asset staking pools**:
+users stake one ERC-20 and earn another over a fixed block range. It powers
+protocol partnerships and community reward campaigns.
+
+| | |
+| --- | --- |
+| Factory | `SmartChefFactory` — `0xd47aBc3c294d49750e7b4d21875eB1eCB8432171` |
+| Pool implementation | `SmartChefInitializable` (minimal clones) |
+| Rewards | Pre-funded — the pool must hold the full reward budget |
+
+:::tip[SmartChef vs. Coffee Pools]
+[Coffee Pools](/coffee-pools) are Biscotti's user-facing single-token staking
+product with their own factory and UI. SmartChef is the general-purpose
+primitive kept for partner campaigns; mechanics are nearly identical.
+:::
+
+## Deploying a pool
+
+```solidity
+function deployPool(
+    IERC20  stakedToken,       // what users stake
+    IERC20  rewardToken,       // what they earn
+    uint256 rewardPerBlock,    // emission rate
+    uint256 startBlock,        // rewards start
+    uint256 bonusEndBlock,     // rewards end
+    uint256 poolLimitPerUser,  // 0 = no per-wallet cap
+    address admin              // pool owner
+) external returns (address pool);
+```
+
+Each call deploys a minimal `SmartChefInitializable` clone — cheap to deploy,
+isolated per campaign. The deployer then transfers the full reward budget
+(`rewardPerBlock × (bonusEndBlock − startBlock)`) to the pool address.
+
+## Pool mechanics
+
+Rewards use the standard accumulator model:
+
+```
+accRewardPerShare += blocks × rewardPerBlock × PRECISION / stakedSupply
+pending            = user.amount × accRewardPerShare / PRECISION − user.rewardDebt
+```
+
+- `deposit(amount)` — stake; also harvests pending rewards
+- `withdraw(amount)` — unstake; also harvests
+- `emergencyWithdraw()` — exit without rewards
+- `pendingReward(user)` — view pending rewards
+- Optional `poolLimitPerUser` caps each wallet's stake for fair launches
+
+:::warning[Rewards stop at `bonusEndBlock`]
+Unlike MasterChef farms, SmartChef pools have a hard end. Staking past the
+end block earns nothing; withdraw or roll into a new campaign.
+:::
