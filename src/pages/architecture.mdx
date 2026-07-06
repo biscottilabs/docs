@@ -1,0 +1,110 @@
+---
+title: Protocol Architecture
+description: How Biscotti's contracts fit together — AMMs, router, farms, staking and incentives.
+---
+
+# Protocol Architecture
+
+Biscotti is composed of five contract groups. Each is independently deployed
+and upgrades are performed by deploying new versions — there are no proxies in
+the core protocol.
+
+## System map
+
+```
+                          ┌──────────────────────────┐
+                          │     BiscottiSmartRouter   │
+                          │  multicall + exactInput*  │
+                          │  + exactInputStableSwap   │
+                          └───────────┬──────────────┘
+                        best route / split routing
+              ┌───────────────────────┴───────────────────────┐
+              ▼                                               ▼
+┌───────────────────────────┐               ┌───────────────────────────────┐
+│   Concentrated Liquidity  │               │          Stable Pools          │
+│  UniswapV3Factory         │               │  StableSwapFactory             │
+│  UniswapV3Pool (per pair) │               │  StableSwapPool (per pair)     │
+│  NonfungiblePositionMgr   │               │  StableSwapLP (ERC-20)         │
+│  SwapRouter / QuoterV2    │               │  StableSwapRouter / Info       │
+└─────────────┬─────────────┘               └───────────────┬───────────────┘
+              │ NFT positions                               │ LP tokens
+              ▼                                             ▼
+┌───────────────────────────┐               ┌───────────────────────────────┐
+│       MasterChefV3        │               │        MasterChefERC20         │
+│  stake V3 NFTs → BSCT     │               │  stake ERC-20 LP → BSCT        │
+│  + LmPool per V3 pool     │               │  per-block emissions           │
+└─────────────┬─────────────┘               └───────────────┬───────────────┘
+              │ MINTER_ROLE                                 │ MINTER_ROLE
+              └──────────────────────┬──────────────────────┘
+                                     ▼
+                          ┌──────────────────────┐
+                          │    BiscottiToken     │
+                          │  BSCT — 1B hard cap  │
+                          │  AccessControl       │
+                          └──────────────────────┘
+
+  ┌────────────────────────┐   ┌────────────────────────┐   ┌──────────────────────┐
+  │  CoffeePoolFactory     │   │  SmartChefFactory      │   │  RewardDistributor   │
+  │  + CoffeePool          │   │  + SmartChef clones    │   │  Merkle claims for   │
+  │  stake A → earn B      │   │  stake A → earn B      │   │  trading battles     │
+  └────────────────────────┘   └────────────────────────┘   └──────────────────────┘
+```
+
+## Contract groups
+
+### 1. Concentrated liquidity (Uniswap V3)
+
+A full deployment of Uniswap V3 Core + Periphery: `UniswapV3Factory` creates a
+pool per `(token0, token1, fee)` triple, LPs mint NFT positions through the
+`NonfungiblePositionManager`, and `QuoterV2` / `TickLens` support off-chain
+quoting. See the [contract reference](/concentrated-liquidity/contracts).
+
+### 2. StableSwap
+
+A Curve-style two-coin AMM. `StableSwapFactory` deploys a `StableSwapPool` and
+a paired `StableSwapLP` ERC-20 for each pair. The pools use an amplified
+invariant that keeps slippage near zero around the peg. See the
+[contract reference](/stable-pools/contracts).
+
+### 3. Smart Router
+
+`BiscottiSmartRouter` exposes the `SwapRouter02` dialect the frontend encodes —
+`multicall(uint256,bytes[])`, `exactInputSingle`, `exactInput`, and the
+Biscotti-specific `exactInputStableSwap` — so one transaction can fan a trade
+across V3 and stable pools and settle atomically. Details in
+[Smart Router](/smart-router).
+
+### 4. Yield layer
+
+- **[MasterChefERC20](/farms/classic-farms)** — classic per-block MasterChef
+  for ERC-20 LP tokens (stable LP today, any future classic LP).
+- **[MasterChefV3](/farms/v3-farms)** — NFT-based farm for V3 positions.
+  Deploys one `MasterChefV3LmPool` per incentivized pool to track in-range
+  liquidity with tick-level accounting.
+- **[SmartChef](/farms/smartchef)** and **[Coffee Pools](/coffee-pools)** —
+  single-token "stake A, earn B" pools created by factories.
+
+Both MasterChefs hold `MINTER_ROLE` on `BiscottiToken` and mint BSCT emissions
+directly; no pre-funded reward budget is needed.
+
+### 5. Incentives
+
+`RewardDistributor` is a Merkle-tree distributor used by
+[Trading Battles](/trading-battles): the backend finalizes a season
+leaderboard, publishes a Merkle root as an epoch, and each wallet claims its
+allocation with a proof.
+
+## Off-chain services
+
+| Service | Role |
+| --- | --- |
+| `exchange-analytics-arc` subgraph | Indexes swaps, TVL, volume for [Analytics](/analytics) |
+| `trading-battles-arc` subgraph | Indexes eligible swaps per battle season |
+| Trading-battles API | Finalizes leaderboards, generates Merkle trees, serves proofs |
+
+## Trust model
+
+- Core AMM contracts (V3, StableSwap pools) are immutable once deployed.
+- Farm emission rates, pool weights and reward periods are owner-controlled —
+  see [Security Notes](/developers/security) for the current admin surface and
+  hardening roadmap.

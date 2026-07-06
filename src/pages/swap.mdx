@@ -1,0 +1,67 @@
+---
+title: Swaps
+description: How token swaps work on Biscotti — routing, price impact, slippage and fees.
+---
+
+# Swaps
+
+A swap on Biscotti exchanges one ERC-20 for another at the best available
+price across every pool the protocol knows about.
+
+## How a swap executes
+
+::::steps
+
+### Quote
+
+The app quotes your trade against all candidate routes:
+
+- **V3 pools** — each fee tier of each pair on the path (via `QuoterV2`)
+- **Stable pools** — Curve-style pools for like-priced assets (via `get_dy`)
+- **Multi-hop paths** — e.g. `TOKEN → USDC → EURC` when no direct pool exists
+
+### Route selection
+
+The [Smart Router](/smart-router) picks the route — or a **split** across
+several routes — that maximizes your output after fees and price impact.
+
+### Execution
+
+The trade executes atomically through `BiscottiSmartRouter.multicall`. Either
+every hop of every route succeeds, or the whole transaction reverts. Your
+minimum-received amount (slippage tolerance) is enforced on-chain.
+
+::::
+
+## Fees
+
+| Pool type | Swap fee | Goes to |
+| --- | --- | --- |
+| V3 pool | 0.05% / 0.30% / 1.00% depending on [fee tier](/concentrated-liquidity/fee-tiers) | In-range LPs |
+| Stable pool | 0.04% (configurable per pool) | LPs, minus admin share |
+
+Fees accrue to liquidity providers, not the protocol router — the Smart Router
+itself charges nothing.
+
+## Price impact vs. slippage
+
+- **Price impact** is how much your own trade moves the pool price. Large
+  trades in shallow pools have high impact; the UI warns you before you
+  confirm.
+- **Slippage tolerance** protects you from other people's trades landing
+  before yours. If execution would return less than your minimum, the
+  transaction reverts instead of filling badly.
+
+:::tip[Stable pairs barely slip]
+Swapping between like-priced assets (e.g. USDC ↔ EURC) routes through
+[stable pools](/stable-pools) whose amplified curve keeps price impact near
+zero even for large trades.
+:::
+
+## Exact input only
+
+Biscotti quotes and executes **exact-input** trades: you specify how much you
+sell, and the router guarantees a minimum you receive. Exact-output selectors
+are deliberately absent from the router so a mis-encoded trade reverts loudly
+rather than mis-executing. See [Smart Router](/smart-router) for the
+rationale.

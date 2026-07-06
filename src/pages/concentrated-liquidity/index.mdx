@@ -1,0 +1,67 @@
+---
+title: Concentrated Liquidity
+description: Uniswap V3-style pools on Biscotti — custom price ranges, NFT positions and capital efficiency.
+---
+
+# Concentrated Liquidity
+
+Biscotti's primary AMM is a full deployment of **Uniswap V3** — the
+concentrated liquidity market maker. Instead of spreading capital across the
+entire price curve `(0, ∞)` like a classic AMM, each liquidity provider
+chooses a **price range** and concentrates capital where trading actually
+happens.
+
+## Why it matters
+
+| | Classic AMM (V2) | Concentrated liquidity (V3) |
+| --- | --- | --- |
+| Capital deployment | Entire curve `(0, ∞)` | LP-chosen range `[Pa, Pb]` |
+| Capital efficiency | Baseline | Up to 4000× at tight ranges |
+| Fee earnings | Proportional to pool share | Proportional to **in-range** liquidity share |
+| Position token | Fungible ERC-20 LP | **NFT** (unique per range) |
+| Fee tiers | One | 0.05% / 0.30% / 1.00% |
+
+The result: traders get deeper effective liquidity (less price impact), and
+LPs earn more fees per dollar deposited — at the cost of actively choosing and
+maintaining a range.
+
+## Core mechanics
+
+- **Ranges & ticks** — prices are discretized into ticks; a position provides
+  liquidity between a lower and an upper tick. While the market price is
+  inside your range, your capital earns fees; outside it, your position sits
+  idle in a single asset. Details in
+  [Ticks & Price Ranges](/concentrated-liquidity/ticks-and-ranges).
+- **Fee tiers** — each pair can have several pools at different fee levels
+  suited to its volatility. Details in
+  [Fee Tiers](/concentrated-liquidity/fee-tiers).
+- **NFT positions** — because every position has its own range, positions are
+  non-fungible. The `NonfungiblePositionManager` mints an NFT that represents
+  your position and collects your fees. Details in
+  [Managing Positions](/concentrated-liquidity/managing-positions).
+
+## Earning on top: V3 Farms
+
+Deposit your position NFT into [MasterChefV3](/farms/v3-farms) to earn BSCT
+emissions on top of trading fees. Rewards are weighted by your share of
+deposited liquidity in the pool.
+
+## Deployed contracts
+
+The full V3 suite is live on ARC Testnet:
+
+| Contract | Purpose |
+| --- | --- |
+| `UniswapV3Factory` | Creates one pool per `(token0, token1, fee)` |
+| `NonfungiblePositionManager` | Mints/manages position NFTs, collects fees |
+| `SwapRouter` | Direct V3 swap execution |
+| `QuoterV2` | Off-chain quote simulation |
+| `TickLens` | Batch tick data reads |
+
+Addresses and full API in the
+[Contract Reference](/concentrated-liquidity/contracts).
+
+:::tip[New to concentrated liquidity?]
+Start with [Ticks & Price Ranges](/concentrated-liquidity/ticks-and-ranges) —
+everything else builds on those two concepts.
+:::

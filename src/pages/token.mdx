@@ -1,0 +1,81 @@
+---
+title: BSCT Token
+description: BiscottiToken (BSCT) — the protocol reward token with a 1B hard cap and role-gated minting.
+---
+
+# BSCT Token
+
+`BiscottiToken` is the protocol's reward token. All farm emissions originate
+here, and it is the default reward asset for coffee pools and trading battles.
+
+| Property | Value |
+| --- | --- |
+| Name / Symbol | Biscotti / **BSCT** |
+| Standard | ERC-20 + ERC-20 Permit (EIP-2612) |
+| Max supply | 1,000,000,000 BSCT (hard cap) |
+| Access model | OpenZeppelin `AccessControl` |
+| Address (ARC Testnet) | `0x6AD77e153f6D4Dd7c0F2e194A385e625274dE794` |
+| Source | `src/token/BiscottiToken.sol` |
+
+## Minting model
+
+BSCT has no fixed distribution schedule baked into the token itself. Instead,
+minting is gated behind `MINTER_ROLE`, which is granted only to the two
+emission contracts:
+
+- [`MasterChefERC20`](/farms/classic-farms) mints per-block rewards for ERC-20
+  LP staking.
+- [`MasterChefV3`](/farms/v3-farms) mints in bulk via `upkeep()` to fund
+  fixed-duration reward periods for V3 position staking.
+
+The hard cap is enforced at the token level — no combination of minters can
+push total supply past 1B BSCT.
+
+:::warning[Admin surface]
+Any address holding `MINTER_ROLE` can mint up to the cap. The deployer's
+`MINTER_ROLE` is revoked after granting it to the MasterChef contracts, and
+`DEFAULT_ADMIN_ROLE` is the mechanism that controls future grants. See
+[Security Notes](/developers/security).
+:::
+
+## Interface
+
+```solidity
+// Only callable by addresses holding MINTER_ROLE
+function mint(address to, uint256 amount) external onlyRole(MINTER_ROLE);
+
+// Role management (DEFAULT_ADMIN_ROLE)
+function grantRole(bytes32 role, address account) external;
+function revokeRole(bytes32 role, address account) external;
+
+// EIP-2612 gasless approvals
+function permit(
+    address owner, address spender, uint256 value,
+    uint256 deadline, uint8 v, bytes32 r, bytes32 s
+) external;
+```
+
+## Granting the minter role
+
+After deploying farm contracts, the admin grants `MINTER_ROLE` to both
+MasterChefs:
+
+```bash
+cast send $BISCOTTI_TOKEN \
+  "grantRole(bytes32,address)" \
+  $(cast keccak "MINTER_ROLE") $MASTERCHEF_ERC20 \
+  --rpc-url $RPC_URL --private-key $PRIVATE_KEY
+
+cast send $BISCOTTI_TOKEN \
+  "grantRole(bytes32,address)" \
+  $(cast keccak "MINTER_ROLE") $MASTERCHEF_V3 \
+  --rpc-url $RPC_URL --private-key $PRIVATE_KEY
+```
+
+## Utility
+
+| Use | Where |
+| --- | --- |
+| Farm rewards | [Farms](/farms) — emissions for LP and V3 position staking |
+| Coffee pool rewards | [Coffee Pools](/coffee-pools) — earned on staked tokens |
+| Trading battle prizes | [Trading Battles](/trading-battles) — Merkle-claimed season rewards |

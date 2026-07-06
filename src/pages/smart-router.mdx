@@ -1,0 +1,164 @@
+---
+title: Smart Router
+description: BiscottiSmartRouter — atomic split routing across concentrated-liquidity and stable pools.
+---
+
+# Smart Router
+
+`BiscottiSmartRouter` is the single entry point for trades on Biscotti. It
+aggregates the two AMMs — Uniswap V3-style pools and Curve-style stable pools —
+behind the `SwapRouter02` calling convention, so a single transaction can fan a
+trade across both pool types (**split routing**) and execute atomically.
+
+| | |
+| --- | --- |
+| Contract | `src/router/BiscottiSmartRouter.sol` |
+| Dialect | SwapRouter02 (`multicall` + `exactInput*`) + `exactInputStableSwap` |
+| Funding | Direct ERC-20 `transferFrom` from the payer (no Permit2) |
+| Trade direction | **Exact input only** |
+
+## Design decisions
+
+:::note[Exact input only]
+Exact-output selectors are intentionally absent. The frontend only quotes
+`EXACT_INPUT` trades, so a mis-encoded exact-output call reverts loudly
+instead of mis-executing.
+:::
+
+:::note[No native-wrap handling]
+`WETH9` is set to the sentinel `address(1)` because ARC's native gas token
+**is** the ERC-20 USDC at `0x3600…` — there is no real wrapped-native token,
+and the sentinel keeps any wrap/unwrap branch inert.
+:::
+
+:::note[No V2 support]
+Biscotti has no classic constant-product V2 pools; the router only routes
+through V3 and StableSwap.
+:::
+
+## Interface
+
+### Batching
+
+```solidity
+/// SwapRouter02 dialect — shared deadline for the whole batch.
+function multicall(uint256 deadline, bytes[] calldata data)
+    external returns (bytes[] memory results);
+
+/// Plain batch (selector 0xac9650d8).
+function multicall(bytes[] calldata data)
+    external returns (bytes[] memory results);
+```
+
+Each entry in `data` is an encoded call to one of the swap functions below.
+Calls are executed via `delegatecall` in order; any failure reverts the whole
+batch with the original reason.
+
+### V3 swaps
+
+```solidity
+struct ExactInputSingleParams {
+    address tokenIn;
+    address tokenOut;
+    uint24  fee;
+    address recipient;
+    uint256 amountIn;
+    uint256 amountOutMinimum;
+    uint160 sqrtPriceLimitX96;
+}
+
+/// Single-pool V3 swap (SwapRouter02 dialect).
+function exactInputSingle(ExactInputSingleParams calldata params)
+    external returns (uint256 amountOut);
+
+struct ExactInputParams {
+    bytes   path;       // token(20) | fee(3) | token(20) | fee(3) | ...
+    address recipient;
+    uint256 amountIn;
+    uint256 amountOutMinimum;
+}
+
+/// Multi-hop V3 swap along an encoded path.
+function exactInput(ExactInputParams calldata params)
+    external returns (uint256 amountOut);
+```
+
+Both functions also exist in the classic Uniswap `ISwapRouter` dialect with a
+`deadline` field inside the params struct (selectors `0x414bf389` and
+`0xc04b8d59`), so the router is a drop-in for pure-V3 integrations too.
+
+### Stable swaps
+
+```solidity
+/// Swap along a path of stable pools registered in the StableSwapFactory.
+/// `path` is a list of token addresses; each consecutive pair must have a
+/// deployed stable pool. Coin indices are resolved from the factory on-chain.
+function exactInputStableSwap(
+    address[] calldata path,
+    uint256[] calldata flag,
+    uint256 amountIn,
+    uint256 amountOutMinimum,
+    address to
+) external returns (uint256 amountOut);
+```
+
+### Recipient sentinels
+
+| Sentinel | Meaning |
+| --- | --- |
+| `address(2)` (`ADDRESS_THIS`) | Send output to the router itself — used to chain hops across pool types inside one `multicall` |
+
+A mixed route like *V3 hop → stable hop* encodes the first call with
+`recipient = address(2)` and the second call spends the router's balance,
+delivering the final output to the trader.
+
+## Split routing example
+
+A 10,000 USDC → EURC trade might be quoted as:
+
+```
+Route A (60%): USDC ──0.05% V3──▶ EURC
+Route B (40%): USDC ──StableSwap──▶ EURC
+```
+
+The frontend encodes both routes as two calls inside a single
+`multicall(deadline, [...])`. The trade settles atomically: if either leg
+would violate its `amountOutMinimum`, everything reverts.
+
+## Integration example
+
+```ts
+import { encodeFunctionData, parseUnits } from 'viem'
+
+// 1. Encode the V3 leg
+const v3Leg = encodeFunctionData({
+  abi: routerAbi,
+  functionName: 'exactInputSingle',
+  args: [{
+    tokenIn: USDC,
+    tokenOut: EURC,
+    fee: 500,
+    recipient: trader,
+    amountIn: parseUnits('6000', 6),
+    amountOutMinimum: minOutA,
+    sqrtPriceLimitX96: 0n,
+  }],
+})
+
+// 2. Encode the stable leg
+const stableLeg = encodeFunctionData({
+  abi: routerAbi,
+  functionName: 'exactInputStableSwap',
+  args: [[USDC, EURC], [0n], parseUnits('4000', 6), minOutB, trader],
+})
+
+// 3. Execute both atomically
+await walletClient.writeContract({
+  address: SMART_ROUTER,
+  abi: routerAbi,
+  functionName: 'multicall',
+  args: [deadline, [v3Leg, stableLeg]],
+})
+```
+
+See [Integration Guide](/developers/integrate) for quoting and the full ABI.

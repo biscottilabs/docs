@@ -1,0 +1,70 @@
+---
+title: Quick Start
+description: Connect to ARC, get test tokens and make your first swap on Biscotti.
+---
+
+# Quick Start
+
+Get from zero to your first swap on Biscotti in a few minutes.
+
+## Network details
+
+| Field | Value |
+| --- | --- |
+| Network name | ARC Testnet |
+| Chain ID | `5042002` |
+| Native gas token | USDC (`0x3600000000000000000000000000000000000000`) |
+
+:::tip[No wrapping needed]
+ARC's native gas token **is** the ERC-20 USDC contract. You never wrap or
+unwrap a native token on Biscotti — every asset, including gas, is a plain
+ERC-20.
+:::
+
+## First swap
+
+::::steps
+
+### Connect your wallet
+
+Open [biscotti.finance](https://biscotti.finance) and connect a wallet. If ARC
+Testnet is not configured yet, the app prompts you to add the network
+automatically.
+
+### Get test tokens
+
+Head to the in-app **Faucet** page to receive test USDC and other tokens on
+ARC Testnet.
+
+### Swap
+
+Go to **Swap**, pick a pair (for example USDC → EURC) and enter an amount.
+The [Smart Router](/smart-router) quotes every available route — V3 pools,
+stable pools and multi-hop combinations — and shows you the best one before
+you confirm.
+
+### Approve & confirm
+
+The first trade of each token requires a one-time ERC-20 approval to the
+router. After that, confirm the swap and it executes atomically in a single
+transaction.
+
+::::
+
+## Next steps
+
+- Provide liquidity in a [concentrated liquidity pool](/concentrated-liquidity/managing-positions)
+  or a [stable pool](/stable-pools/providing-liquidity).
+- Stake your position in a [farm](/farms) to earn BSCT on top of trading fees.
+- Stake single tokens in [Coffee Pools](/coffee-pools).
+- Compete in the current [Trading Battle](/trading-battles) season.
+
+## Common tokens (ARC Testnet)
+
+| Token | Address |
+| --- | --- |
+| USDC (native gas) | `0x3600000000000000000000000000000000000000` |
+| EURC | `0x89B50855Aa3bE2F677cD6303Cec089B5F319D72a` |
+| BSCT | `0x6AD77e153f6D4Dd7c0F2e194A385e625274dE794` |
+
+The full contract list lives in [Contract Addresses](/developers/addresses).

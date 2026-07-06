@@ -1,0 +1,98 @@
+---
+title: Ticks & Price Ranges
+description: How concentrated liquidity discretizes price into ticks and how ranges determine fee earnings.
+---
+
+# Ticks & Price Ranges
+
+Concentrated liquidity is built on two ideas: prices are discretized into
+**ticks**, and every position provides liquidity between two of them.
+
+## Ticks
+
+A tick `i` corresponds to the price:
+
+```
+price(i) = 1.0001^i
+```
+
+Each tick is 0.01% (1 basis point) away from its neighbors, which lets the
+pool represent any price between token pairs with fine granularity. The
+current pool price is tracked as `sqrtPriceX96` — the square root of price in
+Q64.96 fixed point — alongside the current tick.
+
+Not every tick is usable by every pool: each [fee tier](/concentrated-liquidity/fee-tiers)
+has a **tick spacing**, and positions may only start and end on multiples of
+it. Wider spacing makes swaps cheaper to compute; narrower spacing allows more
+precise ranges.
+
+## Ranges
+
+A position is defined by:
+
+- `tickLower` — the bottom of your range
+- `tickUpper` — the top of your range
+- `liquidity` — the amount of virtual liquidity you provide between them
+
+```
+                 tickLower          tickUpper
+                     │                  │
+ price ──────────────┼──────●───────────┼───────────▶
+                     │   current        │
+                     │    price         │
+        idle (all    │◀── earning ─────▶│  idle (all
+        token1)      │     fees         │  token0)
+```
+
+### In range
+
+While the market price is **inside** your range, your position:
+
+- holds a mix of both tokens,
+- participates in every swap that crosses the price, and
+- earns a share of fees proportional to your fraction of the **active**
+  liquidity at the current tick.
+
+### Out of range
+
+When price moves **outside** your range, your position converts entirely into
+one token and stops earning fees:
+
+- Price above `tickUpper` → 100% token1 (you sold token0 on the way up)
+- Price below `tickLower` → 100% token0 (you bought token0 on the way down)
+
+Your capital is never lost when out of range — it simply sits idle until price
+returns or you rebalance to a new range.
+
+:::warning[Impermanent loss is amplified]
+Concentrated positions convert between assets faster than full-range ones.
+Tight ranges earn more fees per dollar but suffer more impermanent loss when
+price trends away. Choose ranges that match your view of the pair's
+volatility.
+:::
+
+## Choosing a range
+
+| Strategy | Range | Trade-off |
+| --- | --- | --- |
+| Passive | Full range (min–max tick) | Behaves like a classic AMM; lowest maintenance, lowest fee APR |
+| Wide | e.g. ±20% around price | Rarely out of range; moderate fee boost |
+| Tight | e.g. ±2% around price | Highest fee APR while in range; needs active rebalancing |
+| Stable-pair | Very tight around the peg | Extremely capital-efficient — but consider a [stable pool](/stable-pools) instead |
+
+## Liquidity math (for the curious)
+
+Within a range, token amounts relate to liquidity `L` as:
+
+```
+amount0 = L × (1/√P − 1/√Pb)     // token0 held above current price P
+amount1 = L × (√P − √Pa)         // token1 held below current price P
+```
+
+where `Pa = 1.0001^tickLower`, `Pb = 1.0001^tickUpper`. When you mint a
+position the `NonfungiblePositionManager` computes `L` from the amounts you
+deposit and the current price.
+
+Fees accumulate per unit of liquidity via `feeGrowthInside` accounting between
+your ticks — the same mechanism Biscotti's [V3 farms](/farms/v3-farms) reuse
+to distribute BSCT by in-range liquidity.

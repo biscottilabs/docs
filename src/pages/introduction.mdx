@@ -1,0 +1,72 @@
+---
+title: What is Biscotti?
+description: An introduction to Biscotti Finance — a community-driven DEX on the ARC network.
+---
+
+# What is Biscotti? [A community-driven DEX on the ARC network]
+
+Biscotti Finance is a decentralized exchange (DEX) deployed on **ARC**
+(chain ID `5042002`). It combines two complementary AMM designs behind a single
+smart router, layers BSCT yield incentives on top, and adds a seasonal
+trading-competition system — all fully on-chain and open source.
+
+:::info[Native gas is USDC]
+On ARC, the native gas token **is** the ERC-20 USDC at
+`0x3600000000000000000000000000000000000000`. There is no wrapped-native token
+to manage — you pay gas and trade with the same asset.
+:::
+
+## Products at a glance
+
+| Product | What it does | Docs |
+| --- | --- | --- |
+| **Swap** | Trade any token pair with best-price execution across all pool types | [Swaps](/swap) |
+| **Concentrated Liquidity** | Uniswap V3-style pools — LPs choose a price range and hold an NFT position | [Overview](/concentrated-liquidity) |
+| **Stable Pools** | Curve-style StableSwap pools for like-priced assets (e.g. USDC/EURC) | [Overview](/stable-pools) |
+| **Smart Router** | Splits a single trade across V3 and stable pools atomically | [Smart Router](/smart-router) |
+| **Farms** | Stake V3 positions or LP tokens to earn BSCT emissions | [Farms](/farms) |
+| **Coffee Pools** | Single-token staking — stake one token, earn another | [Coffee Pools](/coffee-pools) |
+| **Trading Battles** | Seasonal trading competitions with Merkle-proof reward claims | [Trading Battles](/trading-battles) |
+| **Analytics** | Volume, TVL, pair and token data from open subgraphs | [Analytics](/analytics) |
+
+## Why two AMM designs?
+
+No single AMM curve is optimal for every pair:
+
+- **Volatile pairs** (e.g. BSCT/USDC) trade best on **concentrated liquidity**,
+  where LPs compress capital into active price ranges and earn more fees per
+  dollar deposited.
+- **Like-priced pairs** (e.g. USDC/EURC, stablecoin pairs) trade best on a
+  **StableSwap invariant**, which keeps slippage near zero while prices stay
+  close to the peg.
+
+The [Smart Router](/smart-router) hides this complexity: it quotes both pool
+types (and multi-hop paths through them) and executes the best route — or a
+split across several routes — in one transaction.
+
+## The BSCT token
+
+[BSCT](/token) is the protocol's reward token: a 1 billion hard-capped ERC-20
+with role-gated minting. All farm emissions originate from it, and it is the
+default reward asset for coffee pools and trading battles.
+
+## Where to go next
+
+::::steps
+
+### Use the app
+
+Follow the [Quick Start](/quick-start) to connect to ARC, get test tokens and
+make your first swap.
+
+### Understand the protocol
+
+Read the [Protocol Architecture](/architecture) for a map of every contract
+and how they interact.
+
+### Build an integration
+
+Jump to the [Developer section](/developers/addresses) for addresses, ABIs and
+code samples.
+
+::::
