@@ -1,0 +1,137 @@
+---
+title: Managing Positions
+description: Minting, increasing, collecting fees from and removing concentrated-liquidity positions.
+---
+
+# Managing Positions
+
+Concentrated-liquidity positions are **NFTs** minted by the
+`NonfungiblePositionManager`. This page walks the full lifecycle — in the app
+and at the contract level.
+
+## Position lifecycle
+
+::::steps
+
+### Mint
+
+Choose a pair, a [fee tier](/concentrated-liquidity/fee-tiers) and a price
+range, then deposit both tokens. The position manager computes your liquidity
+`L` and mints an NFT (`tokenId`) that represents the position.
+
+In the app: **Liquidity → Add**. If the pool doesn't exist yet, the first mint
+creates and initializes it.
+
+### Earn
+
+While price is inside your range you accrue swap fees continuously. Fees sit
+inside the position until collected — they do not auto-compound.
+
+Optionally, stake the NFT in a [V3 farm](/farms/v3-farms) to earn BSCT on top.
+
+### Adjust
+
+- **Increase liquidity** — add more of both tokens to the same range.
+- **Decrease liquidity** — remove part of the position; the withdrawn tokens
+  become owed to you (collect them afterwards).
+- **Rebalance** — there is no "move range" operation; rebalancing means
+  removing liquidity and minting a new position at the new range.
+
+### Collect & close
+
+`collect` transfers accrued fees (and any tokens owed after a decrease) to
+you. Removing 100% of liquidity and collecting everything empties the
+position; you can then `burn` the NFT.
+
+::::
+
+## Contract interface
+
+All functions live on the `NonfungiblePositionManager`
+(`0xBe9ec79854e459F38E0B868A0c3429AAbf6784b2` on ARC Testnet).
+
+```solidity
+struct MintParams {
+    address token0;         // sorted: token0 < token1
+    address token1;
+    uint24  fee;            // 500 | 3000 | 10000
+    int24   tickLower;      // multiple of tick spacing
+    int24   tickUpper;
+    uint256 amount0Desired;
+    uint256 amount1Desired;
+    uint256 amount0Min;     // slippage protection
+    uint256 amount1Min;
+    address recipient;
+    uint256 deadline;
+}
+
+function mint(MintParams calldata params)
+    external payable
+    returns (uint256 tokenId, uint128 liquidity, uint256 amount0, uint256 amount1);
+
+function increaseLiquidity(IncreaseLiquidityParams calldata params)
+    external payable
+    returns (uint128 liquidity, uint256 amount0, uint256 amount1);
+
+function decreaseLiquidity(DecreaseLiquidityParams calldata params)
+    external payable
+    returns (uint256 amount0, uint256 amount1);
+
+/// Pass type(uint128).max as amount0Max/amount1Max to collect everything.
+function collect(CollectParams calldata params)
+    external payable
+    returns (uint256 amount0, uint256 amount1);
+
+function burn(uint256 tokenId) external payable;
+
+function positions(uint256 tokenId)
+    external view
+    returns (
+        uint96 nonce, address operator,
+        address token0, address token1, uint24 fee,
+        int24 tickLower, int24 tickUpper, uint128 liquidity,
+        uint256 feeGrowthInside0LastX128, uint256 feeGrowthInside1LastX128,
+        uint128 tokensOwed0, uint128 tokensOwed1
+    );
+```
+
+## Example: mint a USDC/EURC position
+
+```ts
+import { parseUnits } from 'viem'
+
+const [token0, token1] =
+  USDC.toLowerCase() < EURC.toLowerCase() ? [USDC, EURC] : [EURC, USDC]
+
+await walletClient.writeContract({
+  address: POSITION_MANAGER,
+  abi: nonfungiblePositionManagerAbi,
+  functionName: 'mint',
+  args: [{
+    token0,
+    token1,
+    fee: 500,               // 0.05% tier, tick spacing 10
+    tickLower: -100,        // ≈ price × 0.990
+    tickUpper: 100,         // ≈ price × 1.010
+    amount0Desired: parseUnits('1000', 6),
+    amount1Desired: parseUnits('920', 6),
+    amount0Min: 0n,         // set real slippage bounds in production
+    amount1Min: 0n,
+    recipient: account.address,
+    deadline: BigInt(Math.floor(Date.now() / 1000) + 1800),
+  }],
+})
+```
+
+:::warning[Both tokens need approval]
+Approve `token0` and `token1` to the position manager before minting or
+increasing. When staking in a farm, the NFT itself is transferred with
+`safeTransferFrom` — see [V3 Farms](/farms/v3-farms).
+:::
+
+## Fees while staked in a farm
+
+When your NFT is deposited in [MasterChefV3](/farms/v3-farms), the farm
+contract owns it. You harvest BSCT through the farm; trading-fee collection
+for staked positions is also routed through the farm contract rather than the
+position manager.

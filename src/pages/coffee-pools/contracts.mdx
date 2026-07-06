@@ -1,0 +1,136 @@
+---
+title: Coffee Pools — Contract Reference
+description: CoffeePool and CoffeePoolFactory on-chain API.
+---
+
+# Contract Reference [Coffee Pools]
+
+Source: `src/coffee-pools/CoffeePool.sol`, `src/coffee-pools/CoffeePoolFactory.sol`
+
+## Addresses — ARC Testnet
+
+| Contract | Address |
+| --- | --- |
+| `CoffeePoolFactory` | `0x7F60DcB5C141EC03650469210A4C936aFbe5619F` |
+| Coffee Pool #1 (USDC → BSCT) | `0x58a66E62f38d2b897A3337F2298bD111c29e09FD` |
+| Coffee Pool #2 (USDC → BSCT) | `0xfdE503599321AFAE57f287EC02E5F4a94a9f37D3` |
+
+:::note[ARC Mainnet]
+Mainnet contracts — **coming soon**.
+:::
+
+## CoffeePool
+
+Single-token staking pool. Users stake one ERC-20 and earn another over a
+fixed block range. `Ownable` + `ReentrancyGuard`; rewards use an
+`accRewardPerShare` accumulator scaled by `1e18`.
+
+### Immutable configuration
+
+```solidity
+IERC20 public immutable stakedToken;
+IERC20 public immutable rewardToken;
+
+uint256 public rewardPerBlock;
+uint256 public startBlock;
+uint256 public endBlock;
+uint256 public poolLimitPerUser; // 0 disables the cap
+bool    public hasUserLimit;
+```
+
+### User functions
+
+```solidity
+/// Stake `amount`; harvests pending rewards in the same call.
+/// Reverts with AmountExceedsLimit if a per-user cap would be exceeded.
+function deposit(uint256 amount) external nonReentrant;
+
+/// Unstake `amount`; harvests pending rewards.
+/// Reverts with InsufficientStakedBalance if amount > stake.
+function withdraw(uint256 amount) external nonReentrant;
+
+/// Exit without rewards — forfeits all pending rewards.
+function emergencyWithdraw() external nonReentrant;
+
+/// Pending rewards for a user, simulated to the current block.
+function pendingReward(address _user) external view returns (uint256);
+
+/// Stake + reward checkpoint per user
+function userInfo(address) external view returns (uint256 amount, uint256 rewardDebt);
+```
+
+### Owner functions
+
+```solidity
+/// Stop emissions immediately (sets endBlock = current block)
+function stopRewards() external onlyOwner;
+
+/// Adjust emission rate (before pool start)
+function updateRewardPerBlock(uint256 _rewardPerBlock) external onlyOwner;
+
+/// Move the reward window (before pool start)
+function updateStartAndEndBlocks(uint256 _startBlock, uint256 _endBlock) external onlyOwner;
+
+/// Change or remove the per-wallet cap
+function updatePoolLimitPerUser(uint256 _poolLimitPerUser) external onlyOwner;
+
+/// Recover leftover reward tokens (cannot touch staked principal)
+function recoverRewardTokens(uint256 amount, address to) external onlyOwner;
+
+/// Rescue unrelated tokens sent by mistake (neither staked nor reward token)
+function recoverNonPoolToken(IERC20 token, uint256 amount, address to) external onlyOwner;
+```
+
+:::info[Principal is protected]
+`recoverRewardTokens` and `recoverNonPoolToken` are written so the owner can
+never withdraw users' staked tokens — recovery of the staked token address is
+explicitly rejected (`CannotRecoverStakedToken`).
+:::
+
+### Events
+
+```solidity
+event Deposit(address indexed user, uint256 amount);
+event Withdraw(address indexed user, uint256 amount);
+event EmergencyWithdraw(address indexed user, uint256 amount);
+event RewardHarvest(address indexed user, uint256 amount);
+event RewardPerBlockUpdated(uint256 rewardPerBlock);
+event StartAndEndBlocksUpdated(uint256 startBlock, uint256 endBlock);
+event PoolLimitUpdated(uint256 poolLimitPerUser);
+event RewardsStopped(uint256 blockNumber);
+event RewardTokensRecovered(address indexed to, uint256 amount);
+```
+
+## CoffeePoolFactory
+
+Deploys and indexes Coffee Pools.
+
+```solidity
+function createPool(
+    IERC20  stakedToken,
+    IERC20  rewardToken,
+    uint256 rewardPerBlock,
+    uint256 startBlock,
+    uint256 endBlock,
+    uint256 poolLimitPerUser,
+    address admin
+) external onlyOwner returns (CoffeePool pool);
+
+function poolLength() external view returns (uint256);
+function allPools() external view returns (CoffeePool[] memory);
+
+event CoffeePoolCreated(
+    address indexed pool,
+    address indexed stakedToken,
+    address indexed rewardToken,
+    uint256 rewardPerBlock,
+    uint256 startBlock,
+    uint256 endBlock,
+    uint256 poolLimitPerUser,
+    address admin
+);
+```
+
+After creating a pool, the operator transfers the full reward budget
+(`rewardPerBlock × (endBlock − startBlock)`) to the pool address — emissions
+are paid from the pool's balance, not minted.

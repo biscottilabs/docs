@@ -1,0 +1,59 @@
+---
+title: Fee Tiers
+description: The fee tiers available for concentrated liquidity pools and how to choose between them.
+---
+
+# Fee Tiers
+
+Every pair on Biscotti can have up to three concentrated-liquidity pools — one
+per fee tier. Each tier is a separate pool with its own liquidity, price and
+tick spacing.
+
+## Available tiers
+
+| Fee tier | Fee (`uint24`) | Tick spacing | Best suited for |
+| --- | --- | --- | --- |
+| **0.05%** | `500` | 10 | Like-priced & low-volatility pairs (e.g. USDC/EURC) |
+| **0.30%** | `3000` | 60 | Most volatile pairs (e.g. BSCT/USDC) |
+| **1.00%** | `10000` | 200 | Exotic / long-tail assets |
+
+The fee parameter is expressed in hundredths of a basis point
+(`500 = 0.05%`). Tick spacing constrains where positions may start and end —
+see [Ticks & Price Ranges](/concentrated-liquidity/ticks-and-ranges).
+
+## How fees flow
+
+On every swap, the fee is deducted from the input amount and credited to
+`feeGrowthGlobal` for the pool. Only positions **in range at the moment of the
+swap** accrue a share, proportional to their fraction of active liquidity.
+Fees accumulate inside the position and are paid out when you call `collect`
+on the `NonfungiblePositionManager` — they do **not** auto-compound.
+
+## Choosing a tier as an LP
+
+- **Match the pair's volatility.** Stable pairs can't justify a 0.30% fee —
+  traders will route elsewhere; volatile pairs at 0.05% underprice the
+  impermanent-loss risk you carry.
+- **Follow the liquidity.** The [Smart Router](/smart-router) routes to
+  whichever tier gives traders the best all-in price. A tier with deep
+  liquidity attracts the volume — and the fees.
+- **Check Analytics.** [Info pages](/analytics) show per-pool volume and TVL
+  so you can compare realized fee APR across tiers of the same pair.
+
+:::tip[Same pair, multiple tiers]
+It's normal for one pair to have active pools at several tiers. Arbitrage
+keeps their prices aligned, and the router splits trades across them when
+that improves execution.
+:::
+
+## Creating a pool at a new tier
+
+Anyone can create a pool for any pair/tier via the factory:
+
+```solidity
+UniswapV3Factory.createPool(tokenA, tokenB, fee)
+```
+
+or implicitly through the position manager's
+`createAndInitializePoolIfNecessary` when minting the first position. See
+[Managing Positions](/concentrated-liquidity/managing-positions).

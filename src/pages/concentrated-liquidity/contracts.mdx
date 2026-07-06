@@ -1,0 +1,128 @@
+---
+title: Concentrated Liquidity — Contract Reference
+description: Deployed V3 contracts on ARC Testnet with their key entry points.
+---
+
+# Contract Reference [Concentrated Liquidity]
+
+The concentrated-liquidity suite is a full deployment of Uniswap V3 Core +
+Periphery on ARC Testnet (chain `5042002`).
+
+## Addresses — ARC Testnet
+
+| Contract | Address |
+| --- | --- |
+| `UniswapV3Factory` | `0xcD072e113277d1f5460Bf69568f649b26BD01EF9` |
+| `NonfungiblePositionManager` | `0xBe9ec79854e459F38E0B868A0c3429AAbf6784b2` |
+| `SwapRouter` | `0xfA845604F52843a7b5cfA4030120c6238741F420` |
+| `QuoterV2` | `0xed11D4afd9A7a4fe0bbBAC34315B6B438FF1bc78` |
+| `NonfungibleTokenPositionDescriptor` | `0x1399d6e24F5299beC40A8c1362b2167982265A79` |
+| `NFTDescriptor` (library) | `0xDb78D27B530ed9c0fC582f53b558b75c5ab63A90` |
+| `TickLens` | `0xdaB9698663A399dDC7C58BF46B0b3f312685906A` |
+| `UniswapInterfaceMulticall` | `0x337361Dd8D8Ee27Ab5EfFec69412AC8B080d704a` |
+
+:::note[ARC Mainnet]
+Mainnet contracts — **coming soon**. Follow
+[@biscottidex](https://x.com/biscottidex) for the deployment announcement.
+:::
+
+## UniswapV3Factory
+
+Creates one pool per `(token0, token1, fee)` triple and registers the enabled
+fee tiers.
+
+```solidity
+function createPool(address tokenA, address tokenB, uint24 fee)
+    external returns (address pool);
+
+function getPool(address tokenA, address tokenB, uint24 fee)
+    external view returns (address pool);
+
+/// fee → tickSpacing; 0 means the tier is disabled
+function feeAmountTickSpacing(uint24 fee) external view returns (int24);
+```
+
+## UniswapV3Pool
+
+The core AMM. One instance per pair/tier; created by the factory.
+
+```solidity
+/// Current price, tick and oracle state
+function slot0() external view returns (
+    uint160 sqrtPriceX96, int24 tick,
+    uint16 observationIndex, uint16 observationCardinality,
+    uint16 observationCardinalityNext, uint8 feeProtocol, bool unlocked
+);
+
+function liquidity() external view returns (uint128);
+function fee() external view returns (uint24);
+function tickSpacing() external view returns (int24);
+
+/// Low-level swap — integrators should prefer the Smart Router
+function swap(
+    address recipient, bool zeroForOne,
+    int256 amountSpecified, uint160 sqrtPriceLimitX96,
+    bytes calldata data
+) external returns (int256 amount0, int256 amount1);
+```
+
+## NonfungiblePositionManager
+
+ERC-721 wrapper around pool positions. See
+[Managing Positions](/concentrated-liquidity/managing-positions) for the full
+lifecycle API (`mint`, `increaseLiquidity`, `decreaseLiquidity`, `collect`,
+`burn`, `positions`).
+
+```solidity
+/// Creates + initializes the pool if it doesn't exist, then no-ops
+function createAndInitializePoolIfNecessary(
+    address token0, address token1, uint24 fee, uint160 sqrtPriceX96
+) external payable returns (address pool);
+```
+
+## QuoterV2
+
+Simulates swaps off-chain (call with `eth_call`, never on-chain — it is
+gas-intensive by design).
+
+```solidity
+struct QuoteExactInputSingleParams {
+    address tokenIn;
+    address tokenOut;
+    uint256 amountIn;
+    uint24  fee;
+    uint160 sqrtPriceLimitX96;
+}
+
+function quoteExactInputSingle(QuoteExactInputSingleParams memory params)
+    external returns (
+        uint256 amountOut,
+        uint160 sqrtPriceX96After,
+        uint32 initializedTicksCrossed,
+        uint256 gasEstimate
+    );
+
+/// Multi-hop quote over an encoded path: token | fee | token | fee | token
+function quoteExactInput(bytes memory path, uint256 amountIn)
+    external returns (
+        uint256 amountOut,
+        uint160[] memory sqrtPriceX96AfterList,
+        uint32[] memory initializedTicksCrossedList,
+        uint256 gasEstimate
+    );
+```
+
+## TickLens
+
+Batch-reads populated ticks for building liquidity charts and routing tables.
+
+```solidity
+function getPopulatedTicksInWord(address pool, int16 tickBitmapIndex)
+    external view returns (PopulatedTick[] memory populatedTicks);
+```
+
+## Related
+
+- [Smart Router](/smart-router) — the recommended swap entry point
+- [V3 Farms](/farms/v3-farms) — BSCT incentives for position NFTs
+- [Integration Guide](/developers/integrate) — end-to-end code samples

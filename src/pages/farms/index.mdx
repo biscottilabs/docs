@@ -1,0 +1,67 @@
+---
+title: Farms Overview
+description: Earn BSCT by staking V3 positions or LP tokens in Biscotti's MasterChef farms.
+---
+
+# Farms
+
+Farms pay **BSCT** emissions on top of the trading fees you already earn as a
+liquidity provider. Biscotti runs two MasterChef contracts — one per AMM — plus
+factory-made single-token pools.
+
+## The three farm types
+
+| | Stake | Contract | Emission model |
+| --- | --- | --- | --- |
+| [V3 Farms](/farms/v3-farms) | Concentrated-liquidity **NFT positions** | `MasterChefV3` | Fixed-duration reward periods (`upkeep`) |
+| [Classic Farms](/farms/classic-farms) | **ERC-20 LP tokens** (stable LP) | `MasterChefERC20` | Per-block emissions |
+| [SmartChef Pools](/farms/smartchef) | A single token | `SmartChefInitializable` clones | Per-block, pre-funded |
+
+Related: [Coffee Pools](/coffee-pools) are Biscotti's flagship single-token
+staking product — stake one token, earn another.
+
+## How emissions work
+
+Both MasterChefs hold `MINTER_ROLE` on the [BSCT token](/token) and mint
+emissions directly — no pre-funded budget:
+
+- **Classic farms** mint `bscttPerBlock` every block, split across pools by
+  **allocation points** (`allocPoint / totalAllocPoint`).
+- **V3 farms** mint in bulk when the operator calls `upkeep(amount, duration)`,
+  then stream `rewardPerSecond` to pools by allocation points, and within each
+  pool to positions by their share of deposited liquidity.
+
+The BSCT hard cap (1B) bounds all emissions at the token level.
+
+## Harvesting
+
+- Rewards accrue continuously and are claimed with `harvest`/`deposit(pid, 0)`
+  (see each farm's page).
+- Harvesting never touches your principal — LP tokens and NFTs stay staked.
+- `emergencyWithdraw` exits instantly but **forfeits pending rewards** — it
+  exists purely as an escape hatch.
+
+:::warning[Emergency withdrawal forfeits rewards]
+`emergencyWithdraw` skips reward accounting entirely by design. Use the
+normal `withdraw` unless the normal path is unusable.
+:::
+
+## APR composition
+
+Farm APR shown in the app has two components:
+
+```
+Total APR = Fee APR (from swaps, paid by the pool)
+          + Farm APR (BSCT emissions, paid by the MasterChef)
+```
+
+Fee APR comes from [Analytics](/analytics) subgraph data; Farm APR is computed
+from on-chain emission rates, allocation points and staked liquidity — the
+exact formulas are on each farm page.
+
+## Live farms — ARC Testnet
+
+| Farm | Type | Alloc points |
+| --- | --- | --- |
+| USDC/EURC 0.05% (V3) | V3 farm (pid 0) | 100 |
+| USDC/EURC stable LP | Classic farm (pid 0) | 100 |
