@@ -4,67 +4,256 @@ description: A community-driven DEX on ARC — concentrated liquidity, stable po
 layout: minimal
 content:
   width: full
+outline: false
 ---
 
-import { HomePage, Cards, Card } from 'vocs'
+<style>{`
+  /* Light defaults; dark values applied when Vocs sets data-vocs-theme="dark"
+     (with a prefers-color-scheme fallback for the no-JS first paint). */
+  :root:has(#bsc-landing) {
+    --bsc-page: #faf6ee;
+    --bsc-fg: #251107;
+    --bsc-muted: #6b5a4c;
+    --bsc-accent: #8a4b26;
+    --bsc-border: rgba(37,17,7,0.12);
+    --bsc-card: rgba(255,255,255,0.55);
+    --bsc-card-hover: rgba(255,255,255,0.9);
+    --bsc-btn-bg: #251107;
+    --bsc-btn-fg: #faf6ee;
+    --bsc-btn-bg-hover: #3a2412;
+    background: var(--bsc-page) !important;
+  }
+  :root[data-vocs-theme="dark"]:has(#bsc-landing) {
+    --bsc-page: #0c0a08;
+    --bsc-fg: #f4ede1;
+    --bsc-muted: #a89a8a;
+    --bsc-accent: #e0a370;
+    --bsc-border: rgba(244,237,225,0.10);
+    --bsc-card: rgba(244,237,225,0.03);
+    --bsc-card-hover: rgba(244,237,225,0.06);
+    --bsc-btn-bg: #f4ede1;
+    --bsc-btn-fg: #17110b;
+    --bsc-btn-bg-hover: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-vocs-theme="light"]):has(#bsc-landing) {
+      --bsc-page: #0c0a08;
+      --bsc-fg: #f4ede1;
+      --bsc-muted: #a89a8a;
+      --bsc-accent: #e0a370;
+      --bsc-border: rgba(244,237,225,0.10);
+      --bsc-card: rgba(244,237,225,0.03);
+      --bsc-card-hover: rgba(244,237,225,0.06);
+      --bsc-btn-bg: #f4ede1;
+      --bsc-btn-fg: #17110b;
+      --bsc-btn-bg-hover: #ffffff;
+    }
+  }
 
-<HomePage.Root>
-  <HomePage.Tagline>Brew your DeFi. ☕</HomePage.Tagline>
-  <HomePage.Description>
-    Biscotti Finance is a community-driven DEX on the ARC network — swap with
-    deep liquidity across concentrated-liquidity and stable pools, earn BSCT in
-    farms and coffee pools, and compete in on-chain trading battles.
-  </HomePage.Description>
-  <HomePage.Buttons>
-    <HomePage.Button href="/introduction" variant="accent">Get started</HomePage.Button>
-    <HomePage.Button href="/developers/addresses">Contract addresses</HomePage.Button>
-    <HomePage.Button href="https://biscotti.finance">Launch app</HomePage.Button>
-  </HomePage.Buttons>
-</HomePage.Root>
+  #bsc-landing {
+    max-width: 1112px;
+    margin: 0 auto;
+    padding: clamp(2rem, 7vh, 5.5rem) 1.5rem 4rem;
+    color: var(--bsc-fg);
+  }
 
-<div style={{ maxWidth: '1080px', margin: '2rem auto 0' }}>
+  #bsc-landing .bsc-hero { max-width: 46rem; }
 
-<Cards>
-  <Card
-    href="/concentrated-liquidity"
-    title="Concentrated Liquidity"
-    description="Uniswap V3-style pools with custom price ranges, NFT positions and multiple fee tiers."
-  />
-  <Card
-    href="/stable-pools"
-    title="Stable Pools"
-    description="Curve-style StableSwap pools for like-priced assets with ultra-low slippage."
-  />
-  <Card
-    href="/smart-router"
-    title="Smart Router"
-    description="One transaction, best execution — split routing across V3 and stable pools."
-  />
-  <Card
-    href="/farms"
-    title="Farms"
-    description="Stake V3 positions or LP tokens in MasterChef farms and earn BSCT emissions."
-  />
-  <Card
-    href="/coffee-pools"
-    title="Coffee Pools"
-    description="Single-token staking pools — stake one token, earn another over a fixed period."
-  />
-  <Card
-    href="/trading-battles"
-    title="Trading Battles"
-    description="Seasonal trading competitions with Merkle-verified on-chain reward claims."
-  />
-  <Card
-    href="/analytics"
-    title="Analytics"
-    description="Protocol, pair and token analytics powered by open subgraphs."
-  />
-  <Card
-    href="/developers/integrate"
-    title="Build on Biscotti"
-    description="Addresses, ABIs and integration guides for every protocol contract."
-  />
-</Cards>
+  #bsc-landing .bsc-kicker {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.02em;
+    color: var(--bsc-accent);
+    border: 1px solid var(--bsc-border);
+    border-radius: 999px; padding: 0.3rem 0.85rem;
+    margin-bottom: 1.75rem;
+  }
+
+  #bsc-landing h1.bsc-title {
+    font-size: clamp(2.5rem, 6.5vw, 4.25rem);
+    line-height: 1.04; letter-spacing: -0.03em; font-weight: 800;
+    margin: 0 0 1.5rem; border: none; padding: 0;
+  }
+  #bsc-landing h1.bsc-title em {
+    font-style: normal; color: var(--bsc-accent);
+  }
+
+  #bsc-landing .bsc-desc {
+    font-size: 1.125rem; line-height: 1.7; color: var(--bsc-muted);
+    margin: 0 0 2.25rem; max-width: 42rem;
+  }
+
+  #bsc-landing .bsc-buttons { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 3.5rem; }
+  #bsc-landing .bsc-btn {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    border-radius: 10px; padding: 0.7rem 1.25rem;
+    font-size: 0.9375rem; font-weight: 600; text-decoration: none;
+    border: 1px solid var(--bsc-border); color: var(--bsc-fg);
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  #bsc-landing .bsc-btn:hover { background: var(--bsc-card-hover); text-decoration: none; }
+  #bsc-landing .bsc-btn-primary {
+    background: var(--bsc-btn-bg);
+    color: var(--bsc-btn-fg);
+    border-color: transparent;
+  }
+  #bsc-landing .bsc-btn-primary:hover {
+    background: var(--bsc-btn-bg-hover);
+  }
+
+  #bsc-landing .bsc-code { max-width: 46rem; margin-bottom: 4.5rem; }
+
+  #bsc-landing .bsc-section-label {
+    font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--bsc-muted); margin: 0 0 1.25rem;
+  }
+
+  #bsc-landing .bsc-grid {
+    display: grid; gap: 0.875rem;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    margin-bottom: 3.5rem;
+  }
+  #bsc-landing .bsc-card {
+    display: block; border: 1px solid var(--bsc-border); border-radius: 12px;
+    padding: 1.15rem 1.25rem; background: var(--bsc-card);
+    text-decoration: none; color: inherit;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  #bsc-landing .bsc-card:hover {
+    border-color: var(--bsc-accent); background: var(--bsc-card-hover);
+    text-decoration: none;
+  }
+  #bsc-landing .bsc-card strong {
+    display: block; font-size: 0.9875rem; font-weight: 700; margin-bottom: 0.4rem;
+    color: var(--bsc-fg);
+  }
+  #bsc-landing .bsc-card span {
+    font-size: 0.875rem; line-height: 1.55; color: var(--bsc-muted);
+  }
+
+  #bsc-landing .bsc-meta {
+    display: flex; flex-wrap: wrap; gap: 0.5rem 1.75rem;
+    border-top: 1px solid var(--bsc-border); padding-top: 1.5rem;
+    font-size: 0.875rem; color: var(--bsc-muted);
+  }
+  #bsc-landing .bsc-meta b { color: var(--bsc-fg); font-weight: 650; }
+`}</style>
+
+<div id="bsc-landing">
+
+<div className="bsc-hero">
+  <span className="bsc-kicker">☕ Live on ARC Testnet — chain 5042002</span>
+
+  <h1 className="bsc-title">Deep liquidity<br />for traders <em>&amp;</em> builders.</h1>
+
+  <p className="bsc-desc">
+    Biscotti Finance is a community-driven DEX on ARC. Swap through
+    concentrated-liquidity and stable pools with one smart router, earn BSCT
+    in farms and coffee pools, and compete in on-chain trading battles —
+    every product and contract documented here.
+  </p>
+
+  <div className="bsc-buttons">
+    <a className="bsc-btn bsc-btn-primary" href="/introduction">Read the docs →</a>
+    <a className="bsc-btn" href="/developers/addresses">Contract addresses</a>
+    <a className="bsc-btn" href="https://github.com/biscottilabs">GitHub</a>
+  </div>
+</div>
+
+<div className="bsc-code">
+
+:::code-group
+
+```ts [quote.ts]
+// Quote USDC → EURC through the 0.05% pool
+const { result } = await client.simulateContract({
+  address: QUOTER_V2,
+  abi: quoterV2Abi,
+  functionName: 'quoteExactInputSingle',
+  args: [{
+    tokenIn: USDC,
+    tokenOut: EURC,
+    amountIn: 1_000_000_000n,
+    fee: 500,
+    sqrtPriceLimitX96: 0n,
+  }],
+})
+```
+
+```ts [swap.ts]
+// Execute via the Smart Router — exact input, atomic
+await wallet.writeContract({
+  address: SMART_ROUTER,
+  abi: smartRouterAbi,
+  functionName: 'exactInputSingle',
+  args: [{
+    tokenIn: USDC,
+    tokenOut: EURC,
+    fee: 500,
+    recipient: me,
+    amountIn,
+    amountOutMinimum,
+    sqrtPriceLimitX96: 0n,
+  }],
+})
+```
+
+```ts [chain.ts]
+// ARC Testnet — native gas is USDC itself
+export const arcTestnet = defineChain({
+  id: 5042002,
+  name: 'ARC Testnet',
+  nativeCurrency: { name: 'USD Coin', symbol: 'USDC', decimals: 18 },
+  rpcUrls: { default: { http: [RPC_URL] } },
+})
+```
+
+:::
+
+</div>
+
+<p className="bsc-section-label">Explore the protocol</p>
+
+<div className="bsc-grid">
+  <a className="bsc-card" href="/concentrated-liquidity">
+    <strong>Concentrated Liquidity</strong>
+    <span>V3-style pools with custom price ranges, NFT positions and three fee tiers.</span>
+  </a>
+  <a className="bsc-card" href="/stable-pools">
+    <strong>Stable Pools</strong>
+    <span>Curve-style StableSwap for like-priced assets with near-zero slippage.</span>
+  </a>
+  <a className="bsc-card" href="/smart-router">
+    <strong>Smart Router</strong>
+    <span>One transaction, best execution — split routing across both AMMs.</span>
+  </a>
+  <a className="bsc-card" href="/farms">
+    <strong>Farms</strong>
+    <span>Stake V3 positions or LP tokens in MasterChef farms for BSCT emissions.</span>
+  </a>
+  <a className="bsc-card" href="/coffee-pools">
+    <strong>Coffee Pools</strong>
+    <span>Single-token staking — stake one token, earn another. No IL, no lock-up.</span>
+  </a>
+  <a className="bsc-card" href="/trading-battles">
+    <strong>Trading Battles</strong>
+    <span>Seasonal competitions with Merkle-verified on-chain reward claims.</span>
+  </a>
+  <a className="bsc-card" href="/analytics">
+    <strong>Analytics</strong>
+    <span>Volume, TVL, pair and token data from open subgraphs.</span>
+  </a>
+  <a className="bsc-card" href="/developers/integrate">
+    <strong>Build on Biscotti</strong>
+    <span>Addresses, ABIs and integration guides for every protocol contract.</span>
+  </a>
+</div>
+
+<div className="bsc-meta">
+  <span><b>2</b> AMM designs</span>
+  <span><b>3</b> fee tiers</span>
+  <span><b>1B</b> BSCT hard cap</span>
+  <span><b>100%</b> open source</span>
+  <span>AI-ready — <a href="/developers/ai">llms.txt</a></span>
+</div>
 
 </div>

@@ -9,6 +9,8 @@ export default defineConfig({
   // Vocs emits it as the <base> tag, so links break on any other host.
   // baseUrl: 'https://docs.biscotti.finance',
   accentColor: 'light-dark(#8a4b26, #e0a370)',
+  logoUrl: { light: '/logo-light.svg', dark: '/logo-dark.svg' },
+  iconUrl: '/logo-mark.svg',
   checkDeadlinks: true,
   editLink: {
     link: 'https://github.com/biscottilabs/biscottie/edit/main/docs/src/pages/:path',
