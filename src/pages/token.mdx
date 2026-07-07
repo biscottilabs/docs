@@ -72,56 +72,77 @@ cast send $BISCOTTI_TOKEN \
   --rpc-url $RPC_URL --private-key $PRIVATE_KEY
 ```
 
-## Tokenomics
+## BSCT Tokenomics
 
-BSCT follows a **mint-and-burn** model: emissions are minted continuously to
-reward the people who make the protocol work (liquidity providers and
-stakers), while protocol revenue buys back and burns BSCT — with the goal of
-burns outpacing emissions once trading volume matures.
+Our goal at Biscotti is to build a decentralized ecosystem that prioritizes
+flexibility and sustainability for the BSCT community, liquidity providers
+and Biscotti supporters.
 
-### Supply
+Biscotti's target is an annual deflation rate of at least **~4% per year**
+and a total BSCT supply reduction of **~20% within five years of mainnet
+launch**. To achieve this, Biscotti implements a **buy-back-and-burn**
+strategy, ultimately leading to a deflationary BSCT token.
 
-| | |
+### What drives burns
+
+Burns are driven by every product in the Biscotti ecosystem — specifically, a
+large share of fees from:
+
+| Product | Burn contribution |
 | --- | --- |
-| Hard cap | 1,000,000,000 BSCT — enforced at the contract level |
-| Initial supply | Minimal — supply enters circulation through emissions, not a pre-mine |
-| Long-term target | **Net-deflationary**: weekly burns ≥ weekly emissions |
+| **Spot trading — stable pools** | Up to 50% of every stable swap fee (the protocol's admin-fee share) |
+| **Spot trading — concentrated liquidity** | A protocol share of V3 trading fees (activating at mainnet) |
+| **Trading Battles** | Unclaimed season rewards recovered after each claim deadline |
+| **Coffee Pool campaigns** | A share of partner campaign fees |
 
-### Emission allocation
+Burns are executed on a fixed weekly cadence and published, so the burn rate
+is independently auditable.
 
-Emissions are directed where they create protocol value, weighted by
-governance-adjustable allocation points:
+### How emissions are managed
 
-| Destination | Share of emissions | Mechanism |
-| --- | --- | --- |
-| **V3 farms** (concentrated liquidity) | ~55% | `MasterChefV3.upkeep()` reward periods |
-| **Classic farms** (stable LP) | ~20% | `MasterChefERC20` per-block emissions |
-| **Coffee Pools & staking** | ~15% | Funded pool budgets |
-| **Ecosystem growth fund** | ~10% | Trading battles, partnerships, listings |
+Emissions are carefully managed to ensure liquidity is directed to the most
+productive pools and products. Biscotti's focus is on scaling volume growth
+by optimizing liquidity incentives and boosting revenue per BSCT spent —
+every emission decision revolves around creating real revenue and long-term
+success for the entire community.
 
-Shares are indicative for the current testnet phase and will be ratified
-before mainnet; live values are always readable on-chain via allocation
-points (see [Farms](/farms)).
+Products that receive BSCT emissions:
 
-### Deflationary mechanics (activating at mainnet)
+| Destination | Mechanism |
+| --- | --- |
+| **V3 farms** (concentrated liquidity) | `MasterChefV3.upkeep()` reward periods |
+| **Classic farms** (stable LP) | `MasterChefERC20` per-block emissions |
+| **Coffee Pools** | Funded pool budgets |
+| **Ecosystem growth** | Trading battles, partnerships, listings |
 
-Protocol revenue funds a recurring **buy-back-and-burn**:
+Live weights are always readable on-chain via allocation points — see
+[Farms](/farms).
 
-- **Stable-pool admin fees** — 50% of every stable swap fee accrues to the
-  protocol and is used to buy back BSCT.
-- **Trading-battle entry surpluses and unclaimed rewards** — recovered after
-  each season's claim deadline.
-- **Weekly burn cadence** — burns are executed and published on a fixed
-  schedule so the burn rate is auditable.
+### Does BSCT have a hard cap?
 
-The long-run target is an annual **net supply reduction of ~4%**, with
-emission cuts phased in as fee revenue grows — emissions bootstrap liquidity
-early, revenue sustains rewards later.
+Yes. BSCT has a hard cap of **1,000,000,000 (1B)**, enforced directly in the
+token contract — no minter, present or future, can exceed it. Emission
+contracts mint *within* the cap; the cap itself can only decrease through
+burns, never increase.
 
-:::info[Emissions are already capped]
-Whatever the schedule, the 1B hard cap is enforced by the token contract —
-no minter, present or future, can exceed it.
-:::
+### How to confirm BSCT supply for yourself
+
+1. Open the BSCT token contract
+   (`0x6AD77e153f6D4Dd7c0F2e194A385e625274dE794`) on the ARC block explorer
+   and check how much BSCT is held by the burn address — that is the total
+   amount removed from circulation forever, impossible to ever retrieve.
+2. Subtract the burned amount from the **Total Supply** the explorer shows.
+
+This gives you the actual circulating BSCT supply.
+
+### How is BSCT supply reduced?
+
+The goal is for deflation to run **higher than emission** — more BSCT leaving
+circulation than being produced — by building deflationary mechanisms into
+every Biscotti product. Buy-back-and-burn activates with ARC Mainnet, with
+emission reductions phased in as fee revenue grows: emissions bootstrap
+liquidity early, revenue sustains rewards later. See the
+[Roadmap](/roadmap).
 
 ## Utility
 
