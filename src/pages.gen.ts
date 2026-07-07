@@ -5,6 +5,7 @@ import type { PathsForPages } from 'waku/router'
 
 // prettier-ignore
 type Page =
+  | { path: '/_api/api/og'; render: 'static' }
   | { path: '/analytics'; render: 'static' }
   | { path: '/architecture'; render: 'static' }
   | { path: '/coffee-pools/contracts'; render: 'static' }

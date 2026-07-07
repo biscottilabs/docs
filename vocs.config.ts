@@ -5,9 +5,7 @@ export default defineConfig({
   titleTemplate: '%s – Biscotti Docs',
   description:
     'Documentation for Biscotti Finance — a community-driven DEX on ARC with concentrated liquidity, stable pools, yield farms, coffee pools and on-chain trading battles.',
-  // Set this once docs.biscotti.finance is attached to the Vercel project —
-  // Vocs emits it as the <base> tag, so links break on any other host.
-  // baseUrl: 'https://docs.biscotti.finance',
+  baseUrl: 'https://docs.biscotti.finance',
   accentColor: 'light-dark(#8a4b26, #e0a370)',
   logoUrl: { light: '/logo-light.svg', dark: '/logo-dark.svg' },
   iconUrl: '/logo-mark.svg',
