@@ -1,0 +1,267 @@
+---
+title: Subgraphs
+description: Public GraphQL endpoints for Biscotti's exchange analytics and trading battles, with ready-to-run queries.
+---
+
+# Subgraphs
+
+All Biscotti protocol data is indexed by two open-source subgraphs deployed on
+[The Graph](https://thegraph.com). The endpoints are public — every query on
+this page is ready to run, and powers the same numbers you see in the app.
+
+## Endpoints & playgrounds
+
+Each endpoint has an interactive **GraphiQL playground** — open it in the
+browser, paste any query from this page (or click a *Run it* link, which
+pre-fills the query for you) and press ▶.
+
+| Subgraph | Links |
+| --- | --- |
+| **Exchange Analytics** — pools, tokens, swaps, TVL, volume, fees (both AMMs) | [Playground ↗](https://api.studio.thegraph.com/query/1754761/subgraph-exchange-analytics-arc/version/latest/graphql) · [Query endpoint](https://api.studio.thegraph.com/query/1754761/subgraph-exchange-analytics-arc/version/latest) |
+| **Trading Battles** — seasons, per-wallet volume, leaderboards | [Playground ↗](https://api.studio.thegraph.com/query/1754761/trading-battles-arc/version/latest/graphql) · [Query endpoint](https://api.studio.thegraph.com/query/1754761/trading-battles-arc/version/latest) |
+
+Source code for both lives in the `subgraphs/` package of the repository —
+schemas, mappings and tests are fully open.
+
+```bash
+# Programmatic access — every example below works like this:
+curl -s -X POST <QUERY_ENDPOINT> \
+  -H "Content-Type: application/json" \
+  -d '{"query": "<QUERY>"}'
+```
+
+## Exchange Analytics
+
+Indexes both AMMs — concentrated-liquidity (`v3`) and StableSwap (`stable`)
+pools — into one unified schema.
+
+### Entities
+
+| Entity | What it holds |
+| --- | --- |
+| `Factory` | Protocol-wide totals: pool count, tx count, volume, fees, TVL |
+| `Pool` | Per-pool state: `poolType` (`v3`/`stable`), prices, TVL, volume, fees |
+| `Token` | Per-token derived USD price, TVL, volume across all pools |
+| `Swap` / `Mint` / `Burn` | Every trade and liquidity event |
+| `ProtocolDayData` | Daily protocol volume, fees, TVL, tx count |
+| `PoolDayData` / `PoolHourData` | Per-pool snapshots with OHLC for charts |
+| `TokenDayData` / `TokenHourData` | Per-token price/volume snapshots |
+
+### Protocol totals (TVL, volume, fees)
+
+```graphql
+{
+  factories {
+    poolCount
+    txCount
+    totalVolumeUSD
+    totalFeesUSD
+    totalValueLockedUSD
+  }
+}
+```
+
+```json
+{
+  "factories": [{
+    "poolCount": "7",
+    "txCount": "2114",
+    "totalVolumeUSD": "195634.79…",
+    "totalFeesUSD": "97.78…",
+    "totalValueLockedUSD": "12891.47…"
+  }]
+}
+```
+
+[▶ Run it in the playground](https://api.studio.thegraph.com/query/1754761/subgraph-exchange-analytics-arc/version/latest/graphql?query=%7B%20factories%20%7B%20poolCount%20txCount%20totalVolumeUSD%20totalFeesUSD%20totalValueLockedUSD%20%7D%20%7D)
+
+### Top pools by TVL
+
+```graphql
+{
+  pools(first: 5, orderBy: totalValueLockedUSD, orderDirection: desc) {
+    id
+    poolType
+    feeTier
+    token0 { symbol }
+    token1 { symbol }
+    totalValueLockedUSD
+    volumeUSD
+  }
+}
+```
+
+Returns both AMMs side by side — e.g. the USDC/EURC 0.05% `v3` pool and the
+USDC/EURC `stable` pool, ranked by locked value.
+
+[▶ Run it in the playground](https://api.studio.thegraph.com/query/1754761/subgraph-exchange-analytics-arc/version/latest/graphql?query=%7B%20pools%28first%3A%205%2C%20orderBy%3A%20totalValueLockedUSD%2C%20orderDirection%3A%20desc%29%20%7B%20id%20poolType%20feeTier%20token0%20%7B%20symbol%20%7D%20token1%20%7B%20symbol%20%7D%20totalValueLockedUSD%20volumeUSD%20%7D%20%7D)
+
+### Daily protocol volume & TVL (charts)
+
+```graphql
+{
+  protocolDayDatas(first: 30, orderBy: date, orderDirection: desc) {
+    date        # unix day-start
+    volumeUSD
+    feesUSD
+    tvlUSD
+    txCount
+  }
+}
+```
+
+[▶ Run it in the playground](https://api.studio.thegraph.com/query/1754761/subgraph-exchange-analytics-arc/version/latest/graphql?query=%7B%20protocolDayDatas%28first%3A%2030%2C%20orderBy%3A%20date%2C%20orderDirection%3A%20desc%29%20%7B%20date%20volumeUSD%20feesUSD%20tvlUSD%20txCount%20%7D%20%7D)
+
+### Token prices & liquidity
+
+```graphql
+{
+  tokens(orderBy: totalValueLockedUSD, orderDirection: desc) {
+    symbol
+    derivedUSD           # indexed USD price
+    totalValueLockedUSD
+    volumeUSD
+  }
+}
+```
+
+[▶ Run it in the playground](https://api.studio.thegraph.com/query/1754761/subgraph-exchange-analytics-arc/version/latest/graphql?query=%7B%20tokens%28orderBy%3A%20totalValueLockedUSD%2C%20orderDirection%3A%20desc%29%20%7B%20symbol%20derivedUSD%20totalValueLockedUSD%20volumeUSD%20%7D%20%7D)
+
+### Recent swaps in a pool
+
+```graphql
+{
+  swaps(
+    first: 10
+    orderBy: timestamp
+    orderDirection: desc
+    where: { pool: "0x6b15920aec9700dfe3ca2c25343059fbf91769a0" }
+  ) {
+    timestamp
+    sender
+    amountUSD
+    token0 { symbol }
+    token1 { symbol }
+  }
+}
+```
+
+[▶ Run it in the playground](https://api.studio.thegraph.com/query/1754761/subgraph-exchange-analytics-arc/version/latest/graphql?query=%7B%20swaps%28first%3A%2010%2C%20orderBy%3A%20timestamp%2C%20orderDirection%3A%20desc%29%20%7B%20timestamp%20sender%20amountUSD%20token0%20%7B%20symbol%20%7D%20token1%20%7B%20symbol%20%7D%20%7D%20%7D)
+
+## Trading Battles
+
+Indexes every eligible swap into per-season, per-wallet stats — the same data
+that drives the live leaderboard and [season rewards](/trading-battles/rewards).
+
+### Entities
+
+| Entity | What it holds |
+| --- | --- |
+| `BattleSeason` | Season window, total volume, participant & trade counts |
+| `UserBattleStat` | One wallet's volume and trade count within a season |
+| `SeasonDayData` | Daily volume/trades for a season |
+| `RawSwap` | Every indexed swap with USD volume and fee |
+
+### Season overview (volume, participants)
+
+```graphql
+{
+  battleSeasons {
+    slug
+    startsAt
+    endsAt
+    totalVolumeUSD
+    participantCount
+    tradeCount
+  }
+}
+```
+
+```json
+{
+  "battleSeasons": [{
+    "slug": "all-pools-arc",
+    "totalVolumeUSD": "143765.99…",
+    "participantCount": "204",
+    "tradeCount": "634"
+  }]
+}
+```
+
+[▶ Run it in the playground](https://api.studio.thegraph.com/query/1754761/trading-battles-arc/version/latest/graphql?query=%7B%20battleSeasons%20%7B%20slug%20startsAt%20endsAt%20totalVolumeUSD%20participantCount%20tradeCount%20%7D%20%7D)
+
+### Leaderboard — top traders
+
+```graphql
+{
+  userBattleStats(first: 10, orderBy: volumeUSD, orderDirection: desc) {
+    wallet
+    volumeUSD
+    tradeCount
+    firstTradeAt
+    lastTradeAt
+  }
+}
+```
+
+This is exactly how season rankings are computed — anyone can reproduce the
+leaderboard and verify their [reward allocation](/trading-battles/rewards)
+independently.
+
+[▶ Run it in the playground](https://api.studio.thegraph.com/query/1754761/trading-battles-arc/version/latest/graphql?query=%7B%20userBattleStats%28first%3A%2010%2C%20orderBy%3A%20volumeUSD%2C%20orderDirection%3A%20desc%29%20%7B%20wallet%20volumeUSD%20tradeCount%20firstTradeAt%20lastTradeAt%20%7D%20%7D)
+
+### A single wallet's season stats
+
+```graphql
+{
+  userBattleStats(where: { wallet: "0xYourWallet" }) {
+    season { slug }
+    volumeUSD
+    tradeCount
+  }
+}
+```
+
+### Daily season volume (activity chart)
+
+```graphql
+{
+  seasonDayDatas(orderBy: date, orderDirection: desc, first: 30) {
+    date
+    volumeUSD
+    tradeCount
+  }
+}
+```
+
+[▶ Run it in the playground](https://api.studio.thegraph.com/query/1754761/trading-battles-arc/version/latest/graphql?query=%7B%20seasonDayDatas%28orderBy%3A%20date%2C%20orderDirection%3A%20desc%2C%20first%3A%2030%29%20%7B%20date%20volumeUSD%20tradeCount%20%7D%20%7D)
+
+## Using from TypeScript
+
+```ts
+const ANALYTICS =
+  'https://api.studio.thegraph.com/query/1754761/subgraph-exchange-analytics-arc/version/latest'
+
+const { data } = await fetch(ANALYTICS, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    query: `{
+      factories { totalValueLockedUSD totalVolumeUSD }
+    }`,
+  }),
+}).then((r) => r.json())
+
+console.log('TVL:', data.factories[0].totalValueLockedUSD)
+```
+
+:::tip[Pagination & filtering]
+Standard Graph Protocol query features apply everywhere: `first`/`skip`
+pagination (max 1000 per page), `orderBy`/`orderDirection`, and `where`
+filters on any indexed field.
+:::
+
+:::info[Mainnet]
+These endpoints index **ARC Testnet**. Mainnet subgraph endpoints will be
+published here at launch — see the [Roadmap](/roadmap).
+:::

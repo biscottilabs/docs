@@ -46,30 +46,25 @@ Indexes eligible swaps for [Trading Battles](/trading-battles):
 
 ## Querying yourself
 
-Both subgraphs expose standard GraphQL endpoints. Example — top pairs by
-volume:
+Both subgraphs expose public GraphQL endpoints on
+[The Graph](https://thegraph.com), each with an interactive playground you
+can query straight from the browser — endpoints, playground links, schemas
+and a set of tested queries (protocol TVL, top pools, token prices,
+leaderboards) are in the [Subgraphs reference](/developers/subgraphs).
+Example — top pools by TVL
+([run it ↗](https://api.studio.thegraph.com/query/1754761/subgraph-exchange-analytics-arc/version/latest/graphql?query=%7B%20pools%28first%3A%205%2C%20orderBy%3A%20totalValueLockedUSD%2C%20orderDirection%3A%20desc%29%20%7B%20poolType%20token0%20%7B%20symbol%20%7D%20token1%20%7B%20symbol%20%7D%20totalValueLockedUSD%20volumeUSD%20%7D%20%7D)):
 
 ```graphql
 {
-  pairDayDatas(
-    first: 10
-    orderBy: dailyVolumeUSD
-    orderDirection: desc
-    where: { date_gte: 1780000000 }
-  ) {
-    pairAddress
+  pools(first: 5, orderBy: totalValueLockedUSD, orderDirection: desc) {
+    poolType            # "v3" | "stable"
     token0 { symbol }
     token1 { symbol }
-    dailyVolumeUSD
-    reserveUSD
+    totalValueLockedUSD
+    volumeUSD
   }
 }
 ```
-
-:::info[Endpoints]
-Public subgraph endpoints for ARC Testnet are published in the app repository
-(`subgraphs/`). Mainnet endpoints will be listed here at launch.
-:::
 
 ## On-chain data sources
 

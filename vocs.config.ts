@@ -89,6 +89,7 @@ export default defineConfig({
       items: [
         { text: 'Contract Addresses', link: '/developers/addresses' },
         { text: 'Integration Guide', link: '/developers/integrate' },
+        { text: 'Subgraphs', link: '/developers/subgraphs' },
         { text: 'ABIs', link: '/developers/abis' },
         { text: 'Deployment Guide', link: '/developers/deployments' },
         { text: 'Security Notes', link: '/developers/security' },
