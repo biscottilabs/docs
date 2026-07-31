@@ -13,17 +13,17 @@ enabled without changing the components that consume wagmi.
 :::code-group
 
 ```bash [bun]
-bun add biscotti-finance-connectkit wagmi@^2.17.0 viem@^2.55.10 \
+bun add @biscottidex/connectkit wagmi@^2.17.0 viem@^2.55.10 \
   @tanstack/react-query
 ```
 
 ```bash [npm]
-npm install biscotti-finance-connectkit wagmi@^2.17.0 viem@^2.55.10 \
+npm install @biscottidex/connectkit wagmi@^2.17.0 viem@^2.55.10 \
   @tanstack/react-query
 ```
 
 ```bash [pnpm]
-pnpm add biscotti-finance-connectkit wagmi@^2.17.0 viem@^2.55.10 \
+pnpm add @biscottidex/connectkit wagmi@^2.17.0 viem@^2.55.10 \
   @tanstack/react-query
 ```
 
@@ -48,7 +48,7 @@ import { arcTestnet } from 'wagmi/chains'
 import {
   ConnectKitProvider,
   getDefaultConfig,
-} from 'biscotti-finance-connectkit'
+} from '@biscottidex/connectkit'
 
 const config = createConfig(
   getDefaultConfig({
@@ -89,7 +89,7 @@ Mark the provider module with `'use client'`, use
 ## Add the connect button
 
 ```tsx
-import { ConnectKitButton } from 'biscotti-finance-connectkit'
+import { ConnectKitButton } from '@biscottidex/connectkit'
 
 export function Header() {
   return <ConnectKitButton />

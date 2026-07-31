@@ -125,7 +125,7 @@ import { arcTestnet, base } from 'wagmi/chains'
 import {
   ConnectKitProvider,
   getDefaultConfig,
-} from 'biscotti-finance-connectkit'
+} from '@biscottidex/connectkit'
 
 const circleEnvironment =
   import.meta.env.VITE_CIRCLE_ENVIRONMENT === 'live'
@@ -270,7 +270,7 @@ Use `useCircleLogin` when you need your own method picker:
 
 ```tsx
 import { useState } from 'react'
-import { useCircleLogin } from 'biscotti-finance-connectkit'
+import { useCircleLogin } from '@biscottidex/connectkit'
 
 export function CircleLogin() {
   const [email, setEmail] = useState('')
