@@ -1,0 +1,120 @@
+---
+title: Getting Started
+description: Install Biscotti ConnectKit and connect a wallet with wagmi in React.
+---
+
+# Getting Started
+
+This guide creates a standard wallet connection first. Circle can then be
+enabled without changing the components that consume wagmi.
+
+## Install
+
+:::code-group
+
+```bash [bun]
+bun add biscotti-finance-connectkit wagmi@^2.17.0 viem@^2.55.10 \
+  @tanstack/react-query
+```
+
+```bash [npm]
+npm install biscotti-finance-connectkit wagmi@^2.17.0 viem@^2.55.10 \
+  @tanstack/react-query
+```
+
+```bash [pnpm]
+pnpm add biscotti-finance-connectkit wagmi@^2.17.0 viem@^2.55.10 \
+  @tanstack/react-query
+```
+
+:::
+
+Create a project in [WalletConnect Cloud](https://cloud.walletconnect.com/) and
+copy its project ID.
+
+```bash
+# .env.local (Vite)
+VITE_WALLETCONNECT_PROJECT_ID=your_project_id
+```
+
+## Configure the providers
+
+```tsx
+// src/components/Web3Provider.tsx
+import type { ReactNode } from 'react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { createConfig, http, WagmiProvider } from 'wagmi'
+import { arcTestnet } from 'wagmi/chains'
+import {
+  ConnectKitProvider,
+  getDefaultConfig,
+} from 'biscotti-finance-connectkit'
+
+const config = createConfig(
+  getDefaultConfig({
+    appName: 'My app',
+    appDescription: 'My app description',
+    appUrl: window.location.origin,
+    chains: [arcTestnet],
+    transports: {
+      [arcTestnet.id]: http(),
+    },
+    walletConnectProjectId:
+      import.meta.env.VITE_WALLETCONNECT_PROJECT_ID,
+  }),
+)
+
+const queryClient = new QueryClient()
+
+export function Web3Provider({ children }: { children: ReactNode }) {
+  return (
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <ConnectKitProvider>{children}</ConnectKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
+  )
+}
+```
+
+Mount `Web3Provider` once near the root of the application.
+
+:::tip[Next.js]
+Mark the provider module with `'use client'`, use
+`process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID`, and avoid reading
+`window.location` during server rendering. Supply an explicit production
+`appUrl` instead.
+:::
+
+## Add the connect button
+
+```tsx
+import { ConnectKitButton } from 'biscotti-finance-connectkit'
+
+export function Header() {
+  return <ConnectKitButton />
+}
+```
+
+The same button shows installed wallets, WalletConnect, Coinbase Wallet and,
+when configured, Sign in with Circle.
+
+## Read the connected account
+
+Because Biscotti ConnectKit uses wagmi, standard wagmi hooks work for every
+connector:
+
+```tsx
+import { useAccount } from 'wagmi'
+
+export function Account() {
+  const { address, chain, isConnected } = useAccount()
+
+  if (!isConnected) return <p>Not connected</p>
+  return <p>{address} on {chain?.name}</p>
+}
+```
+
+Next, enable [Sign in with Circle](/connectkit/sign-in-with-circle) so users who
+do not already have a wallet can create one with Google or email.
+

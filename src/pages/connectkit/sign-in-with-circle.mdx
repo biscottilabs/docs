@@ -1,0 +1,325 @@
+---
+title: Sign in with Circle
+description: Add Google and email OTP authentication backed by Circle user-controlled wallets.
+---
+
+# Sign in with Circle
+
+Sign in with Circle lets users create and use a wallet with an account they
+already understand: Google or email. Biscotti ConnectKit handles the
+authentication choice, Circle's hosted wallet flows and the wagmi connector.
+
+This integration follows Circle's
+[user-controlled wallet application guide](https://developers.circle.com/wallets/user-controlled/build-a-wallet-app).
+Read that guide alongside this page when configuring Circle or Google.
+
+## User experience
+
+When a user chooses **Sign in with Circle**, the modal first presents:
+
+1. **Continue with Google** — starts Google OAuth, returns to the app, resumes
+   wallet provisioning automatically and connects wagmi.
+2. **Email & one-time code** — collects an email address and continues through
+   Circle's hosted OTP verification flow.
+
+New users approve Circle's hosted wallet creation challenge. Returning users
+reuse their existing wallet for the configured chain. Once complete, the
+result behaves like every other wagmi connection.
+
+:::warning[A backend is required]
+The Circle API key grants privileged API access. Keep it on a server you
+control. Never prefix it with `VITE_`, `NEXT_PUBLIC_` or otherwise include it
+in a browser bundle.
+:::
+
+## 1. Install Circle's Web SDK
+
+```bash
+bun add @circle-fin/w3s-pw-web-sdk@^1.1.11
+```
+
+The dependency is optional for the base package and dynamically loaded only
+when Circle is enabled.
+
+## 2. Create the credentials
+
+| Value | Obtain it from | Runtime |
+| --- | --- | --- |
+| WalletConnect project ID | [WalletConnect Cloud](https://cloud.walletconnect.com/) | Browser |
+| Circle App ID | Circle Console → Wallets → User Controlled → Configurator | Browser |
+| Google Web client ID | Google Cloud → Google Auth Platform → OAuth clients | Browser |
+| Circle API key | Circle Console → Keys | **Server only** |
+| Circle environment | Your application configuration | Browser and server |
+
+In [Google Cloud Console](https://console.cloud.google.com/), create an OAuth
+client with application type **Web application**. Register every exact callback
+origin, such as `http://localhost:5173` and your production origin. Publish the
+OAuth app, or explicitly add test users, before testing with other accounts.
+
+In [Circle Console](https://console.circle.com/):
+
+- open Wallets → User Controlled → Configurator;
+- enable Google under Authentication Methods → Social Logins and paste the same
+  Google Web client ID;
+- enable Email under Authentication Methods → Email;
+- configure Circle's required email provider settings for OTP delivery;
+- copy the App ID and create the API key for the intended environment.
+
+## 3. Add environment variables
+
+Use one of these complete templates.
+
+:::code-group
+
+```bash [Vite: .env.local]
+VITE_WALLETCONNECT_PROJECT_ID=...
+VITE_CIRCLE_ENVIRONMENT=sandbox
+VITE_CIRCLE_APP_ID=...
+VITE_GOOGLE_CLIENT_ID=...
+
+# Read only by the Vite development server middleware.
+CIRCLE_API_KEY=TEST_API_KEY:...
+```
+
+```bash [Next.js: .env.local]
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=...
+NEXT_PUBLIC_CIRCLE_ENVIRONMENT=sandbox
+NEXT_PUBLIC_CIRCLE_APP_ID=...
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=...
+
+# Read only by Next.js route handlers.
+CIRCLE_API_KEY=TEST_API_KEY:...
+```
+
+:::
+
+Do not commit `.env.local`. A `.env.example` should contain names and empty
+placeholders only.
+
+## 4. Match the key to the chain
+
+Biscotti's recommended defaults are deliberately strict:
+
+| Environment | API key prefix | wagmi chain | Circle blockchain |
+| --- | --- | --- | --- |
+| `sandbox` | `TEST_API_KEY:` | Arc Testnet (`5042002`) | `ARC-TESTNET` |
+| `live` | `LIVE_API_KEY:` | Base (`8453`) | `BASE` |
+
+Sandbox keys cannot initialize wallets on mainnets. Live keys cannot initialize
+wallets on testnets. An invalid combination is rejected during the health
+preflight and again by the backend before login starts.
+
+:::warning[Switching environments]
+App ID, API key and chain must belong to the same Circle environment. Restart
+the development server after changing server environment variables. ConnectKit
+clears an incompatible stored Circle session, so the user must authenticate
+again after switching between Arc Testnet and Base.
+:::
+
+## 5. Configure ConnectKit
+
+```tsx
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { createConfig, WagmiProvider } from 'wagmi'
+import { arcTestnet, base } from 'wagmi/chains'
+import {
+  ConnectKitProvider,
+  getDefaultConfig,
+} from 'biscotti-finance-connectkit'
+
+const circleEnvironment =
+  import.meta.env.VITE_CIRCLE_ENVIRONMENT === 'live'
+    ? 'live'
+    : 'sandbox'
+
+const circleChain =
+  circleEnvironment === 'live' ? base : arcTestnet
+
+const config = createConfig(
+  getDefaultConfig({
+    appName: 'My app',
+    chains: [circleChain],
+    walletConnectProjectId:
+      import.meta.env.VITE_WALLETCONNECT_PROJECT_ID,
+    circle: {
+      appId: import.meta.env.VITE_CIRCLE_APP_ID,
+      google: {
+        clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+        redirectUri: window.location.origin,
+        selectAccountPrompt: true,
+      },
+      methods: ['google', 'email'],
+      defaultChainId: circleChain.id,
+      endpoints: { basePath: '/api/circle' },
+    },
+  }),
+)
+
+const queryClient = new QueryClient()
+
+export function Web3Provider({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <ConnectKitProvider debugMode={import.meta.env.DEV}>
+          {children}
+        </ConnectKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
+  )
+}
+```
+
+Declaring `circle` in `getDefaultConfig` is enough. The connector carries those
+options into `ConnectKitProvider`. If you create wagmi connectors manually,
+pass the same object as `options={{ circle }}` on `ConnectKitProvider`;
+provider options take precedence.
+
+### Circle options
+
+| Option | Default | Purpose |
+| --- | --- | --- |
+| `enabled` | `true` | Feature flag; omitting `circle` disables the integration. |
+| `appId` | — | Public Circle App ID. |
+| `google.clientId` | — | Public Google OAuth Web client ID. |
+| `google.redirectUri` | current origin | Exact registered OAuth callback origin. |
+| `google.selectAccountPrompt` | `false` | Ask Google to show its account chooser. |
+| `methods` | `['google', 'email']` | Methods displayed in the first Circle screen. |
+| `defaultChainId` | first configured chain | Chain on which to provision/select the wallet. |
+| `endpoints.basePath` | `/api/circle` | Base URL of your server adapter. |
+| `endpoints.headers` | — | Static or generated headers for app authentication. |
+| `endpoints.fetchOptions` | — | Extra `fetch` options such as credentials. |
+| `adapter` | — | Replace the built-in HTTP adapter. |
+| `chains` | built-in map | Add or override Circle blockchain identifiers. |
+| `feeLevel` | `MEDIUM` | Circle transaction fee strategy. |
+| `name` | `Sign in with Circle` | Connector label in the wallet list. |
+
+Only Google and email are implemented. Other values in the method type are
+reserved and appear as unavailable when supplied.
+
+## 6. Provide the server routes
+
+ConnectKit's default HTTP adapter calls these routes:
+
+| Your route | Circle endpoint |
+| --- | --- |
+| `GET /api/circle/health` | Local configuration check |
+| `POST /api/circle/device-token` | `POST /users/social/token` |
+| `POST /api/circle/email-otp` | `POST /users/email/token` |
+| `POST /api/circle/initialize-user` | `POST /user/initialize` |
+| `POST /api/circle/wallets` | `GET /wallets` |
+| `POST /api/circle/sign-message` | `POST /user/sign/message` |
+| `POST /api/circle/sign-typed-data` | `POST /user/sign/typedData` |
+| `POST /api/circle/transaction` | `POST /user/transactions/contractExecution` |
+
+The [Vite example development server](https://github.com/biscottilabs/biscotti-connectkit/blob/main/examples/vite/circleDevServer.ts)
+implements these endpoints as Vite middleware. It exists for local testing,
+not production:
+
+```bash
+bun run dev:circle
+```
+
+Production applications must deploy equivalent authenticated server routes.
+Each Circle request should:
+
+- read `CIRCLE_API_KEY` only on the server;
+- validate the requested environment and blockchain;
+- generate a fresh idempotency key for mutating Circle calls;
+- send the Circle user token in `X-User-Token` where required;
+- authenticate the caller with your own application session;
+- verify that the caller is entitled to act as that Circle user;
+- return safe, structured errors and retain Circle's request ID in server logs.
+
+If your API is not represented by these HTTP routes, implement
+`CircleBackendAdapter` and pass it as `circle.adapter`.
+
+## Google redirect continuation
+
+Google uses a full-page redirect. Before leaving, ConnectKit stores only the
+pending values needed to resume. On return it detects Circle's callback state,
+opens the continuation screen, finishes provisioning or loads the existing
+wallet, connects wagmi, and removes callback credentials from the address bar.
+
+Do not add another “connect after redirect” button. If the modal does not reopen
+automatically, verify that `ConnectKitProvider` is mounted on the callback page
+and that Google's redirect URI matches exactly.
+
+## Error behavior
+
+`/health` is checked before authentication. Missing local configuration should
+fail quickly rather than leave the user on “Checking Circle configuration…”.
+
+- In development, or when `debugMode` is enabled, the modal identifies missing
+  client variables, missing server variables and console configuration issues.
+- In production, users see a short generic availability message. Variable names,
+  raw Circle responses and secrets are not exposed.
+- Developers receive stable error codes, HTTP status, Circle request IDs when
+  available, and actionable environment mismatch messages.
+
+Keep `debugMode` tied to the framework's development flag. Never enable detailed
+diagnostics for production users.
+
+## Headless UI
+
+Use `useCircleLogin` when you need your own method picker:
+
+```tsx
+import { useState } from 'react'
+import { useCircleLogin } from 'biscotti-finance-connectkit'
+
+export function CircleLogin() {
+  const [email, setEmail] = useState('')
+  const {
+    status,
+    issues,
+    address,
+    signInWithGoogle,
+    signInWithEmail,
+    signOut,
+  } = useCircleLogin()
+
+  if (address) {
+    return <button onClick={signOut}>Sign out {address}</button>
+  }
+
+  return (
+    <div>
+      <button onClick={signInWithGoogle}>Continue with Google</button>
+      <input
+        type="email"
+        value={email}
+        onChange={(event) => setEmail(event.target.value)}
+      />
+      <button onClick={() => signInWithEmail(email)}>
+        Email me a code
+      </button>
+      <p aria-live="polite">{status}</p>
+      {import.meta.env.DEV &&
+        issues.map((issue) => <p key={issue.id}>{issue.message}</p>)}
+    </div>
+  )
+}
+```
+
+## Supported wallet operations
+
+Circle-backed accounts support wagmi account access, message signing,
+EIP-712 typed-data signing and contract execution. Circle broadcasts
+transactions as part of its challenge flow.
+
+The connector intentionally does not support:
+
+- `eth_sign`;
+- returning a signed-but-unbroadcast transaction;
+- contract deployment without a destination address;
+- caller-selected gas fields—configure `feeLevel` instead.
+
+Sessions are stored per browser tab. The current integration does not
+automatically refresh Circle's session token, so users sign in again when it
+expires.
+

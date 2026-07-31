@@ -1,0 +1,109 @@
+---
+title: Customization
+description: Customize ConnectKit themes, provider behavior and connect buttons.
+---
+
+# Customization
+
+Biscotti ConnectKit preserves the theming and custom button APIs inherited from
+ConnectKit while adding Circle-specific provider options.
+
+## Themes and display mode
+
+```tsx
+<ConnectKitProvider theme="rounded" mode="dark">
+  {children}
+</ConnectKitProvider>
+```
+
+Built-in themes are `auto`, `web95`, `retro`, `soft`, `midnight`, `minimal`,
+`rounded` and `nouns`. Display mode can be `light`, `dark` or `auto`.
+
+Use `customTheme` to override theme tokens:
+
+```tsx
+<ConnectKitProvider
+  mode="dark"
+  customTheme={{
+    '--ck-font-family': 'Inter, sans-serif',
+    '--ck-connectbutton-background': '#8a4b26',
+    '--ck-connectbutton-hover-background': '#6f391c',
+    '--ck-overlay-background': 'rgba(20, 12, 8, 0.72)',
+  }}
+>
+  {children}
+</ConnectKitProvider>
+```
+
+## Provider options
+
+```tsx
+<ConnectKitProvider
+  debugMode={import.meta.env.DEV}
+  options={{
+    language: 'en-US',
+    hideBalance: false,
+    hideTooltips: false,
+    hideQuestionMarkCTA: false,
+    hideNoWalletCTA: false,
+    hideRecentBadge: false,
+    walletConnectCTA: 'both',
+    reducedMotion: false,
+    overlayBlur: 8,
+    enforceSupportedChains: true,
+    initialChainId: 5042002,
+  }}
+>
+  {children}
+</ConnectKitProvider>
+```
+
+`debugMode` logs detailed errors and enables developer diagnostics. Bind it to
+your framework's development flag rather than a user-controlled value.
+
+## Custom connect button
+
+`ConnectKitButton.Custom` exposes connection state while ConnectKit retains
+control of the modal:
+
+```tsx
+import { ConnectKitButton } from 'biscotti-finance-connectkit'
+
+export function WalletButton() {
+  return (
+    <ConnectKitButton.Custom>
+      {({
+        isConnected,
+        isConnecting,
+        show,
+        address,
+        ensName,
+        truncatedAddress,
+        chain,
+        unsupported,
+      }) => (
+        <button onClick={show} type="button">
+          {isConnecting
+            ? 'Connecting…'
+            : isConnected
+              ? ensName ?? truncatedAddress ?? address
+              : 'Connect wallet'}
+          {unsupported ? ' — switch network' : ''}
+          {chain ? ` (${chain.name})` : ''}
+        </button>
+      )}
+    </ConnectKitButton.Custom>
+  )
+}
+```
+
+The render callback also provides `hide()`. It returns `null` until mounted,
+which avoids server/client hydration mismatches.
+
+## Custom Circle method screen
+
+The default modal already presents Google and email OTP as a two-step flow. If
+your product needs a fully custom screen, use
+[`useCircleLogin`](/connectkit/sign-in-with-circle#headless-ui) rather than
+reimplementing Circle's authentication and session lifecycle.
+

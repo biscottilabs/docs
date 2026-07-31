@@ -15,12 +15,19 @@ type Page =
   | { path: '/concentrated-liquidity'; render: 'static' }
   | { path: '/concentrated-liquidity/managing-positions'; render: 'static' }
   | { path: '/concentrated-liquidity/ticks-and-ranges'; render: 'static' }
+  | { path: '/connectkit/chains'; render: 'static' }
+  | { path: '/connectkit/customization'; render: 'static' }
+  | { path: '/connectkit/getting-started'; render: 'static' }
+  | { path: '/connectkit'; render: 'static' }
+  | { path: '/connectkit/sign-in-with-circle'; render: 'static' }
+  | { path: '/connectkit/troubleshooting'; render: 'static' }
   | { path: '/developers/abis'; render: 'static' }
   | { path: '/developers/addresses'; render: 'static' }
   | { path: '/developers/ai'; render: 'static' }
   | { path: '/developers/deployments'; render: 'static' }
   | { path: '/developers/integrate'; render: 'static' }
   | { path: '/developers/security'; render: 'static' }
+  | { path: '/developers/subgraphs'; render: 'static' }
   | { path: '/farms/classic-farms'; render: 'static' }
   | { path: '/farms'; render: 'static' }
   | { path: '/farms/smartchef'; render: 'static' }

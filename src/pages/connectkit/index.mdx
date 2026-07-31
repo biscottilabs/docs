@@ -1,0 +1,73 @@
+---
+title: ConnectKit
+description: A developer-friendly React wallet connection SDK with first-class Circle user-controlled wallets.
+---
+
+# Biscotti ConnectKit
+
+Biscotti ConnectKit is a React wallet connection SDK built on
+[wagmi](https://wagmi.sh) and [viem](https://viem.sh). It keeps the familiar
+ConnectKit experience for browser wallets, WalletConnect and Coinbase Wallet,
+and adds **Sign in with Circle** as a first-class connection method.
+
+Users can therefore enter your app in either of two ways:
+
+- connect an existing crypto wallet;
+- sign in with Google or an email one-time code and receive a
+  [Circle user-controlled wallet](https://developers.circle.com/wallets/user-controlled/build-a-wallet-app).
+
+Both paths end at the same wagmi interface. Your application continues to use
+`useAccount`, `useSignMessage`, `useSignTypedData` and `useSendTransaction`
+without maintaining a separate Circle-specific account model.
+
+:::tip[Circle is opt-in]
+If you omit the `circle` option, the Circle connector and its UI are disabled.
+The Circle Web SDK is an optional peer dependency and is loaded only when the
+integration is enabled.
+:::
+
+## What this fork adds
+
+The project is based on Family's ConnectKit design and developer API. Biscotti's
+fork adds:
+
+- a two-step Circle flow that first asks users to choose Google or email OTP;
+- automatic Google OAuth continuation after redirect, with no second
+  **Connect Wallet** click;
+- Circle wallet provisioning exposed as a standard wagmi connector;
+- strict sandbox/live key and chain validation;
+- developer-facing configuration diagnostics without leaking server secrets to
+  production users;
+- built-in Circle chain mapping, including Arc Testnet;
+- backend adapters and headless hooks for teams building their own UI.
+
+## Pick a path
+
+- [Getting started](/connectkit/getting-started) — install the SDK, configure
+  wagmi and render a connect button.
+- [Sign in with Circle](/connectkit/sign-in-with-circle) — configure Google,
+  email OTP, credentials, backend endpoints and environment behavior.
+- [Chains and environments](/connectkit/chains) — understand the Arc Testnet
+  and Base defaults and add supported networks.
+- [Customization](/connectkit/customization) — themes, provider options and a
+  custom connect button.
+- [Troubleshooting](/connectkit/troubleshooting) — diagnose OAuth, Circle API
+  and bundler errors.
+
+## Package
+
+```bash
+bun add biscotti-finance-connectkit wagmi@^2.17.0 viem@^2.55.10 \
+  @tanstack/react-query
+```
+
+The package supports React 17 or 18, wagmi 2.x and viem 2.x. Circle support
+additionally requires `@circle-fin/w3s-pw-web-sdk`.
+
+## Source and upstream
+
+- [Biscotti ConnectKit source](https://github.com/biscottilabs/biscotti-connectkit)
+- [Circle user-controlled wallet guide](https://developers.circle.com/wallets/user-controlled/build-a-wallet-app)
+- [wagmi documentation](https://wagmi.sh)
+- [viem documentation](https://viem.sh)
+

@@ -1,0 +1,106 @@
+---
+title: Troubleshooting
+description: Diagnose Circle configuration, OAuth, API and Vite bundling errors.
+---
+
+# Troubleshooting
+
+Start with the exact error code and the request that failed. In development,
+enable diagnostics with:
+
+```tsx
+<ConnectKitProvider debugMode={import.meta.env.DEV}>
+  {children}
+</ConnectKitProvider>
+```
+
+Do not enable detailed diagnostics in production.
+
+## Common Circle errors
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| “Circle is not configured” | A public value or server API key is missing. | Check the complete [environment variable list](/connectkit/sign-in-with-circle#3-add-environment-variables) and `/api/circle/health`. |
+| “Checking Circle configuration…” never finishes | The health route is missing, unreachable or does not return. | Run the backend, confirm `GET /api/circle/health`, and add a server timeout. The included adapter fails its health preflight after a short timeout. |
+| API error says a test key cannot use mainnets | `TEST_API_KEY` is paired with Base or another mainnet. | Set the environment to `sandbox` and use Arc Testnet. |
+| API error says a live key cannot use testnets | `LIVE_API_KEY` is paired with Arc Testnet or another testnet. | Set the environment to `live` and use Base. |
+| Google returns, but the wallet does not connect | The callback page does not mount the provider or pending state was lost. | Mount the same `ConnectKitProvider` on the callback URL and do not clear session storage during redirect. |
+| Google reports `redirect_uri_mismatch` | The current origin is not an exact authorized redirect URI. | Add the exact protocol, hostname and port in Google Cloud. |
+| Google works only for the developer | The OAuth app remains in testing with one test user. | Publish the OAuth consent app or add every tester. |
+| Email code is not delivered | Email authentication/provider is not configured in Circle Console. | Enable Email and finish the provider configuration under User Controlled Wallets. |
+| “No wallet found for this chain” | The user has no Circle wallet matching the selected chain. | Provision that blockchain or restrict the app to provisioned chains. |
+
+## Run the Circle Vite example
+
+From the ConnectKit repository:
+
+```bash
+cp examples/vite/.env.example examples/vite/.env.local
+# Fill the values in examples/vite/.env.local
+bun install
+bun run dev:circle
+```
+
+The command starts Vite on `http://localhost:5173` and installs the local Circle
+API middleware. The server uses a strict port because the Google redirect URI
+must match exactly.
+
+Restart Vite after editing `CIRCLE_API_KEY`; server-side environment variables
+are loaded when the process starts.
+
+## Vite: Node polyfills
+
+Circle's Web SDK currently includes dependencies such as `jsonwebtoken` and
+`jws` that expect Node primitives. Configure Vite's browser polyfills:
+
+```bash
+bun add -d vite-plugin-node-polyfills@0.22.0
+```
+
+```ts
+// vite.config.ts
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { nodePolyfills } from 'vite-plugin-node-polyfills'
+
+export default defineConfig({
+  plugins: [nodePolyfills(), react()],
+  optimizeDeps: {
+    esbuildOptions: { target: 'es2020' },
+  },
+  build: {
+    target: 'es2020',
+  },
+})
+```
+
+An error such as `Object prototype may only be an Object or null` while loading
+`@circle-fin/w3s-pw-web-sdk` is a dependency/bundler compatibility problem, not
+a sandbox-versus-live key problem. Confirm the Circle package is installed,
+deduplicate dependencies, add the Vite polyfills and restart the dev server.
+
+## Babel's 500 KB message
+
+```text
+[BABEL] Note: The code generator has deoptimised the styling of
+.../packages/connectkit/build/index.es.js as it exceeds the max of 500KB.
+```
+
+This is a build-time performance notice, not a runtime error and not related to
+Circle authentication. Babel stops trying to pretty-print a large generated
+bundle. It does not change the code's behavior.
+
+## Safe production errors
+
+Show users a concise retryable message. Send developers:
+
+- a stable application error code;
+- the failed route and HTTP status;
+- Circle's request ID, when supplied;
+- whether the failure is configuration, authentication, wallet provisioning or
+  signing;
+- a redacted server log with the underlying Circle response.
+
+Never render the API key, Circle user token, encryption key, OAuth access token
+or raw authorization headers.
+

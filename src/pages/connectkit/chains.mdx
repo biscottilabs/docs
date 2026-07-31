@@ -1,0 +1,95 @@
+---
+title: Chains & Environments
+description: Configure Arc Testnet, Base and other Circle-supported EVM networks.
+---
+
+# Chains & Environments
+
+Normal wallet connectors can use any chain supported by wagmi and viem. A
+Circle wallet additionally needs an exact mapping from the numeric EIP-155
+chain ID to Circle's blockchain identifier.
+
+## Biscotti defaults
+
+| Use case | wagmi chain | Chain ID | Circle identifier |
+| --- | --- | --- | --- |
+| Development and testing | `arcTestnet` | `5042002` | `ARC-TESTNET` |
+| Production | `base` | `8453` | `BASE` |
+
+Use a Circle sandbox `TEST_API_KEY` with Arc Testnet. Use a live
+`LIVE_API_KEY` with Base. This relationship is enforced by Circle and checked
+by the Biscotti example backend before any authentication call.
+
+```ts
+import { arcTestnet, base } from 'wagmi/chains'
+
+const environment =
+  import.meta.env.VITE_CIRCLE_ENVIRONMENT === 'live'
+    ? 'live'
+    : 'sandbox'
+
+const chain = environment === 'live' ? base : arcTestnet
+```
+
+## Built-in Circle EVM mappings
+
+The connector includes verified mappings for:
+
+- Ethereum and Sepolia;
+- Polygon and Amoy;
+- Avalanche and Fuji;
+- Arbitrum and Arbitrum Sepolia;
+- Base and Base Sepolia;
+- Optimism and Optimism Sepolia;
+- Unichain and Unichain Sepolia;
+- Arc Testnet.
+
+Consult Circle's current
+[supported blockchains](https://developers.circle.com/wallets/supported-blockchains)
+before choosing a production network.
+
+## Add or override a mapping
+
+Circle may support a network before the package ships its mapping. Add it only
+after verifying both identifiers:
+
+```ts
+circle: {
+  appId: import.meta.env.VITE_CIRCLE_APP_ID,
+  google: {
+    clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+  },
+  defaultChainId: 12345,
+  chains: {
+    12345: 'EVM',
+  },
+}
+```
+
+The `chains` field takes precedence over the built-in map. A wrong mapping can
+route wallet provisioning or signing to the wrong network, so do not guess.
+
+## Multi-chain behavior
+
+Circle provisions one wallet for each supported blockchain. Switching chains
+selects the wallet whose Circle blockchain matches the new chain. It does not
+rewrite an existing wallet's network.
+
+If the authenticated Circle user has no wallet on the target chain, the
+connector fails explicitly. Design a multi-chain application to provision the
+required wallets or constrain the available Circle chains.
+
+```tsx
+<ConnectKitProvider
+  options={{
+    initialChainId: arcTestnet.id,
+    enforceSupportedChains: true,
+  }}
+>
+  {children}
+</ConnectKitProvider>
+```
+
+Non-EVM Circle wallets such as Solana cannot implement an EIP-1193 provider and
+are outside this connector's scope.
+

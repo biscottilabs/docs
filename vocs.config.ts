@@ -21,6 +21,7 @@ export default defineConfig({
   ],
   topNav: [
     { text: 'Docs', link: '/introduction' },
+    { text: 'ConnectKit', link: '/connectkit' },
     { text: 'Contracts', link: '/developers/addresses' },
     { text: 'App', link: 'https://biscotti.finance' },
   ],
@@ -83,6 +84,21 @@ export default defineConfig({
     {
       text: 'Analytics',
       items: [{ text: 'Info & Subgraphs', link: '/analytics' }],
+    },
+    {
+      text: 'ConnectKit',
+      items: [
+        { text: 'Overview', link: '/connectkit' },
+        { text: 'Getting Started', link: '/connectkit/getting-started' },
+        {
+          text: 'Sign in with Circle',
+          link: '/connectkit/sign-in-with-circle',
+          badge: { text: 'new', variant: 'info' },
+        },
+        { text: 'Chains & Environments', link: '/connectkit/chains' },
+        { text: 'Customization', link: '/connectkit/customization' },
+        { text: 'Troubleshooting', link: '/connectkit/troubleshooting' },
+      ],
     },
     {
       text: 'Developers',

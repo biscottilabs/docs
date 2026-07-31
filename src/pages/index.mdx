@@ -1,6 +1,6 @@
 ---
 title: Biscotti Finance
-description: A community-driven DEX on ARC — concentrated liquidity, stable pools, yield farms and on-chain trading battles.
+description: The liquidity layer for ARC — trade, earn and build on open markets.
 layout: minimal
 content:
   width: full
@@ -8,252 +8,536 @@ outline: false
 ---
 
 <style>{`
-  /* Light defaults; dark values applied when Vocs sets data-vocs-theme="dark"
-     (with a prefers-color-scheme fallback for the no-JS first paint). */
   :root:has(#bsc-landing) {
-    --bsc-page: #faf6ee;
-    --bsc-fg: #251107;
-    --bsc-muted: #6b5a4c;
+    --bsc-page: #f7f7f6;
+    --bsc-surface: #ffffff;
+    --bsc-surface-2: #f1f1ef;
+    --bsc-fg: #181817;
+    --bsc-muted: #6d6d68;
+    --bsc-faint: #9a9a94;
     --bsc-accent: #8a4b26;
-    --bsc-border: rgba(37,17,7,0.12);
-    --bsc-card: rgba(255,255,255,0.55);
-    --bsc-card-hover: rgba(255,255,255,0.9);
-    --bsc-btn-bg: #251107;
-    --bsc-btn-fg: #faf6ee;
-    --bsc-btn-bg-hover: #3a2412;
+    --bsc-accent-soft: #f1e3d8;
+    --bsc-border: rgba(24, 24, 23, 0.10);
+    --bsc-border-strong: rgba(24, 24, 23, 0.16);
+    --bsc-grid: rgba(24, 24, 23, 0.035);
+    --bsc-shadow: 0 1px 1px rgba(0,0,0,.04), 0 18px 60px rgba(30,22,16,.08);
     background: var(--bsc-page) !important;
   }
+
   :root[data-vocs-theme="dark"]:has(#bsc-landing) {
-    --bsc-page: #0c0a08;
-    --bsc-fg: #f4ede1;
-    --bsc-muted: #a89a8a;
-    --bsc-accent: #e0a370;
-    --bsc-border: rgba(244,237,225,0.10);
-    --bsc-card: rgba(244,237,225,0.03);
-    --bsc-card-hover: rgba(244,237,225,0.06);
-    --bsc-btn-bg: #f4ede1;
-    --bsc-btn-fg: #17110b;
-    --bsc-btn-bg-hover: #ffffff;
+    --bsc-page: #0a0a0a;
+    --bsc-surface: #111110;
+    --bsc-surface-2: #161615;
+    --bsc-fg: #f1f1ef;
+    --bsc-muted: #92928d;
+    --bsc-faint: #656560;
+    --bsc-accent: #d99562;
+    --bsc-accent-soft: #291b13;
+    --bsc-border: rgba(255, 255, 255, 0.09);
+    --bsc-border-strong: rgba(255, 255, 255, 0.15);
+    --bsc-grid: rgba(255, 255, 255, 0.025);
+    --bsc-shadow: 0 1px 1px rgba(255,255,255,.03), 0 24px 80px rgba(0,0,0,.55);
   }
+
   @media (prefers-color-scheme: dark) {
     :root:not([data-vocs-theme="light"]):has(#bsc-landing) {
-      --bsc-page: #0c0a08;
-      --bsc-fg: #f4ede1;
-      --bsc-muted: #a89a8a;
-      --bsc-accent: #e0a370;
-      --bsc-border: rgba(244,237,225,0.10);
-      --bsc-card: rgba(244,237,225,0.03);
-      --bsc-card-hover: rgba(244,237,225,0.06);
-      --bsc-btn-bg: #f4ede1;
-      --bsc-btn-fg: #17110b;
-      --bsc-btn-bg-hover: #ffffff;
+      --bsc-page: #0a0a0a;
+      --bsc-surface: #111110;
+      --bsc-surface-2: #161615;
+      --bsc-fg: #f1f1ef;
+      --bsc-muted: #92928d;
+      --bsc-faint: #656560;
+      --bsc-accent: #d99562;
+      --bsc-accent-soft: #291b13;
+      --bsc-border: rgba(255, 255, 255, 0.09);
+      --bsc-border-strong: rgba(255, 255, 255, 0.15);
+      --bsc-grid: rgba(255, 255, 255, 0.025);
+      --bsc-shadow: 0 1px 1px rgba(255,255,255,.03), 0 24px 80px rgba(0,0,0,.55);
     }
   }
 
   #bsc-landing {
-    max-width: 1112px;
-    margin: 0 auto;
-    padding: clamp(2rem, 7vh, 5.5rem) 1.5rem 4rem;
+    position: relative;
+    overflow: hidden;
     color: var(--bsc-fg);
+    margin: -1.5rem calc(50% - 50vw) 0;
+    padding: 0 max(1.5rem, calc((100vw - 1120px) / 2));
+    font-family: Inter, "SF Pro Text", "SF Pro Display", -apple-system,
+      BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-kerning: normal;
+    font-optical-sizing: auto;
+    font-synthesis: none;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "ss01" 1, "cv01" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
-  #bsc-landing .bsc-hero { max-width: 46rem; }
+  #bsc-landing::before {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    inset: 0 0 auto;
+    height: 48rem;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 45% 34% at 50% 15%, color-mix(in srgb, var(--bsc-accent) 14%, transparent), transparent 72%),
+      linear-gradient(var(--bsc-grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--bsc-grid) 1px, transparent 1px);
+    background-size: auto, 64px 64px, 64px 64px;
+    mask-image: linear-gradient(to bottom, black 0%, transparent 82%);
+  }
 
-  #bsc-landing .bsc-kicker {
-    display: inline-flex; align-items: center; gap: 0.5rem;
-    font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.02em;
-    color: var(--bsc-accent);
-    border: 1px solid var(--bsc-border);
-    border-radius: 999px; padding: 0.3rem 0.85rem;
+  #bsc-landing * { box-sizing: border-box; }
+
+  #bsc-landing .bsc-hero {
+    position: relative;
+    z-index: 1;
+    max-width: 850px;
+    margin: 0 auto;
+    padding: clamp(8rem, 16vw, 12rem) 0 clamp(8rem, 15vw, 11rem);
+    text-align: center;
+  }
+
+  #bsc-landing .bsc-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: .55rem;
     margin-bottom: 1.75rem;
+    color: var(--bsc-muted);
+    font-size: .71rem;
+    font-weight: 550;
+    letter-spacing: .025em;
+  }
+
+  #bsc-landing .bsc-status {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #56b47c;
+    box-shadow: 0 0 0 4px color-mix(in srgb, #56b47c 14%, transparent);
   }
 
   #bsc-landing h1.bsc-title {
-    font-size: clamp(2.5rem, 6.5vw, 4.25rem);
-    line-height: 1.04; letter-spacing: -0.03em; font-weight: 800;
-    margin: 0 0 1.5rem; border: none; padding: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    color: var(--bsc-fg);
+    font-size: clamp(3.1rem, 7.2vw, 5.65rem);
+    font-weight: 540;
+    line-height: .99;
+    letter-spacing: -.062em;
+    text-wrap: balance;
   }
-  #bsc-landing h1.bsc-title em {
-    font-style: normal; color: var(--bsc-accent);
+
+  #bsc-landing h1.bsc-title span {
+    color: var(--bsc-muted);
   }
 
   #bsc-landing .bsc-desc {
-    font-size: 1.125rem; line-height: 1.7; color: var(--bsc-muted);
-    margin: 0 0 2.25rem; max-width: 42rem;
+    max-width: 580px;
+    margin: 1.75rem auto 0;
+    color: var(--bsc-muted);
+    font-size: .985rem;
+    line-height: 1.7;
+    letter-spacing: -.012em;
+    text-wrap: pretty;
   }
 
-  #bsc-landing .bsc-buttons { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 3.5rem; }
+  #bsc-landing .bsc-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: .625rem;
+    margin-top: 2rem;
+  }
+
   #bsc-landing .bsc-btn {
-    display: inline-flex; align-items: center; gap: 0.45rem;
-    border-radius: 10px; padding: 0.7rem 1.25rem;
-    font-size: 0.9375rem; font-weight: 600; text-decoration: none;
-    border: 1px solid var(--bsc-border); color: var(--bsc-fg);
-    transition: background 0.15s ease, border-color 0.15s ease;
-  }
-  #bsc-landing .bsc-btn:hover { background: var(--bsc-card-hover); text-decoration: none; }
-  #bsc-landing .bsc-btn-primary {
-    background: var(--bsc-btn-bg);
-    color: var(--bsc-btn-fg);
-    border-color: transparent;
-  }
-  #bsc-landing .bsc-btn-primary:hover {
-    background: var(--bsc-btn-bg-hover);
-  }
-
-  #bsc-landing .bsc-code { max-width: 46rem; margin-bottom: 4.5rem; }
-
-  #bsc-landing .bsc-section-label {
-    font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.08em;
-    text-transform: uppercase; color: var(--bsc-muted); margin: 0 0 1.25rem;
+    display: inline-flex;
+    min-height: 38px;
+    align-items: center;
+    justify-content: center;
+    gap: .55rem;
+    padding: .55rem .95rem;
+    border: 1px solid var(--bsc-border-strong);
+    border-radius: 7px;
+    color: var(--bsc-fg);
+    background: color-mix(in srgb, var(--bsc-surface) 68%, transparent);
+    font-size: .775rem;
+    font-weight: 550;
+    line-height: 1;
+    text-decoration: none;
+    box-shadow: 0 1px 2px rgba(0,0,0,.04);
+    transition: transform .18s ease, border-color .18s ease, background .18s ease;
   }
 
-  #bsc-landing .bsc-grid {
-    display: grid; gap: 0.875rem;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    margin-bottom: 3.5rem;
-  }
-  #bsc-landing .bsc-card {
-    display: block; border: 1px solid var(--bsc-border); border-radius: 12px;
-    padding: 1.15rem 1.25rem; background: var(--bsc-card);
-    text-decoration: none; color: inherit;
-    transition: border-color 0.15s ease, background 0.15s ease;
-  }
-  #bsc-landing .bsc-card:hover {
-    border-color: var(--bsc-accent); background: var(--bsc-card-hover);
+  #bsc-landing .bsc-btn:hover {
+    transform: translateY(-1px);
+    border-color: var(--bsc-faint);
+    background: var(--bsc-surface);
     text-decoration: none;
   }
-  #bsc-landing .bsc-card strong {
-    display: block; font-size: 0.9875rem; font-weight: 700; margin-bottom: 0.4rem;
-    color: var(--bsc-fg);
-  }
-  #bsc-landing .bsc-card span {
-    font-size: 0.875rem; line-height: 1.55; color: var(--bsc-muted);
+
+  #bsc-landing .bsc-btn-primary {
+    border-color: var(--bsc-fg);
+    color: var(--bsc-page);
+    background: var(--bsc-fg);
   }
 
-  #bsc-landing .bsc-meta {
-    display: flex; flex-wrap: wrap; gap: 0.5rem 1.75rem;
-    border-top: 1px solid var(--bsc-border); padding-top: 1.5rem;
-    font-size: 0.875rem; color: var(--bsc-muted);
+  #bsc-landing .bsc-btn-primary:hover {
+    border-color: var(--bsc-fg);
+    background: var(--bsc-fg);
   }
-  #bsc-landing .bsc-meta b { color: var(--bsc-fg); font-weight: 650; }
+
+  #bsc-landing .bsc-arrow {
+    opacity: .62;
+    transition: transform .18s ease;
+  }
+
+  #bsc-landing .bsc-btn:hover .bsc-arrow { transform: translateX(2px); }
+
+  #bsc-landing .bsc-overline {
+    margin: 0 0 .45rem;
+    color: var(--bsc-faint);
+    font-size: .62rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  #bsc-landing .bsc-section {
+    position: relative;
+    z-index: 1;
+    max-width: 1016px;
+    margin: 0 auto;
+    padding: 0;
+  }
+
+  #bsc-landing .bsc-section-intro {
+    display: grid;
+    grid-template-columns: minmax(0, .8fr) minmax(280px, 1fr);
+    gap: 4rem;
+    align-items: end;
+    margin-bottom: 2.5rem;
+  }
+
+  #bsc-landing .bsc-section-intro h2 {
+    max-width: 530px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    color: var(--bsc-fg);
+    font-size: clamp(2rem, 4.3vw, 3.4rem);
+    font-weight: 520;
+    line-height: 1.06;
+    letter-spacing: -.052em;
+    text-wrap: balance;
+  }
+
+  #bsc-landing .bsc-section-intro p {
+    margin: 0;
+    color: var(--bsc-muted);
+    font-size: .82rem;
+    line-height: 1.7;
+  }
+
+  #bsc-landing .bsc-bento {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: 1px solid var(--bsc-border);
+    border-left: 1px solid var(--bsc-border);
+  }
+
+  #bsc-landing .bsc-feature {
+    position: relative;
+    min-height: 242px;
+    padding: 2rem;
+    overflow: hidden;
+    border-right: 1px solid var(--bsc-border);
+    border-bottom: 1px solid var(--bsc-border);
+    color: inherit;
+    text-decoration: none;
+    transition: background .2s ease;
+  }
+
+  #bsc-landing .bsc-feature:hover {
+    background: color-mix(in srgb, var(--bsc-surface) 55%, transparent);
+    text-decoration: none;
+  }
+
+  #bsc-landing .bsc-feature-number {
+    color: var(--bsc-faint);
+    font-size: .6rem;
+    letter-spacing: .05em;
+  }
+
+  #bsc-landing .bsc-feature h3 {
+    max-width: 290px;
+    margin: 4.5rem 0 .6rem;
+    color: var(--bsc-fg);
+    font-size: 1.05rem;
+    font-weight: 560;
+    letter-spacing: -.025em;
+  }
+
+  #bsc-landing .bsc-feature p {
+    max-width: 355px;
+    margin: 0;
+    color: var(--bsc-muted);
+    font-size: .73rem;
+    line-height: 1.6;
+  }
+
+  #bsc-landing .bsc-feature-arrow {
+    position: absolute;
+    top: 1.7rem;
+    right: 1.8rem;
+    color: var(--bsc-faint);
+    font-size: .85rem;
+    transition: transform .2s ease, color .2s ease;
+  }
+
+  #bsc-landing .bsc-feature:hover .bsc-feature-arrow {
+    transform: translate(2px, -2px);
+    color: var(--bsc-fg);
+  }
+
+  #bsc-landing .bsc-wordmark {
+    position: absolute;
+    right: -1rem;
+    bottom: -1.65rem;
+    color: var(--bsc-grid);
+    font-size: 6.5rem;
+    font-weight: 700;
+    letter-spacing: -.08em;
+    pointer-events: none;
+  }
+
+  #bsc-landing .bsc-links {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid var(--bsc-border);
+  }
+
+  #bsc-landing .bsc-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.15rem 1rem;
+    border-bottom: 1px solid var(--bsc-border);
+    color: var(--bsc-muted);
+    font-size: .68rem;
+    font-weight: 520;
+    text-decoration: none;
+    transition: color .18s ease, background .18s ease;
+  }
+
+  #bsc-landing .bsc-link:not(:last-child) { border-right: 1px solid var(--bsc-border); }
+  #bsc-landing .bsc-link:hover {
+    color: var(--bsc-fg);
+    background: var(--bsc-surface);
+    text-decoration: none;
+  }
+
+  #bsc-landing .bsc-cta {
+    position: relative;
+    z-index: 1;
+    max-width: 1016px;
+    margin: 0 auto;
+    padding: clamp(7rem, 13vw, 11rem) 0 5rem;
+    text-align: center;
+  }
+
+  #bsc-landing .bsc-cta-mark {
+    display: inline-grid;
+    width: 38px;
+    height: 38px;
+    margin-bottom: 1.5rem;
+    place-items: center;
+    border: 1px solid var(--bsc-border);
+    border-radius: 10px;
+    color: var(--bsc-accent);
+    background: var(--bsc-surface);
+    font-size: 1.1rem;
+    box-shadow: 0 8px 28px rgba(0,0,0,.07);
+  }
+
+  #bsc-landing .bsc-cta h2 {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    color: var(--bsc-fg);
+    font-size: clamp(2.1rem, 4.8vw, 3.75rem);
+    font-weight: 520;
+    line-height: 1.05;
+    letter-spacing: -.052em;
+    text-wrap: balance;
+  }
+
+  #bsc-landing .bsc-cta p {
+    max-width: 450px;
+    margin: 1rem auto 0;
+    color: var(--bsc-muted);
+    font-size: .8rem;
+    line-height: 1.65;
+  }
+
+  #bsc-landing .bsc-footer {
+    display: flex;
+    max-width: 1016px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 0 auto;
+    padding: 1.25rem 0 2rem;
+    border-top: 1px solid var(--bsc-border);
+    color: var(--bsc-faint);
+    font-size: .62rem;
+  }
+
+  #bsc-landing .bsc-footer-links { display: flex; gap: 1.25rem; }
+  #bsc-landing .bsc-footer a {
+    color: inherit;
+    text-decoration: none;
+  }
+  #bsc-landing .bsc-footer a:hover { color: var(--bsc-fg); }
+
+  @media (max-width: 720px) {
+    #bsc-landing { margin-top: -1rem; }
+    #bsc-landing .bsc-hero { padding: 6.5rem 0 7rem; }
+    #bsc-landing h1.bsc-title { letter-spacing: -.052em; }
+    #bsc-landing .bsc-section-intro { grid-template-columns: 1fr; gap: 1.25rem; }
+    #bsc-landing .bsc-bento { grid-template-columns: 1fr; }
+    #bsc-landing .bsc-feature { min-height: 220px; padding: 1.5rem; }
+    #bsc-landing .bsc-feature h3 { margin-top: 4rem; }
+    #bsc-landing .bsc-links { grid-template-columns: repeat(2, 1fr); }
+    #bsc-landing .bsc-link:nth-child(2) { border-right: 0; }
+    #bsc-landing .bsc-footer { align-items: flex-start; flex-direction: column; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #bsc-landing * { scroll-behavior: auto !important; transition: none !important; }
+  }
 `}</style>
 
 <div id="bsc-landing">
 
-<div className="bsc-hero">
-  <span className="bsc-kicker">☕ Live on ARC Testnet — chain 5042002</span>
+  <section className="bsc-hero">
+    <div className="bsc-eyebrow">
+      <span className="bsc-status"></span>
+      Live on ARC Testnet · Chain 5042002
+    </div>
 
-  <h1 className="bsc-title">Deep liquidity<br />for traders <em>&amp;</em> builders.</h1>
+    <h1 className="bsc-title">
+      Liquidity,<br /><span>without limits.</span>
+    </h1>
 
-  <p className="bsc-desc">
-    Biscotti Finance is a community-driven DEX on ARC. Swap through
-    concentrated-liquidity and stable pools with one smart router, earn BSCT
-    in farms and coffee pools, and compete in on-chain trading battles —
-    every product and contract documented here.
-  </p>
+    <p className="bsc-desc">
+      Biscotti is the open liquidity layer for ARC. Trade with intelligent
+      routing, deploy capital across precision markets, and build with
+      contracts designed for composability.
+    </p>
 
-  <div className="bsc-buttons">
-    <a className="bsc-btn bsc-btn-primary" href="/introduction">Read the docs →</a>
-    <a className="bsc-btn" href="/developers/addresses">Contract addresses</a>
-    <a className="bsc-btn" href="https://github.com/biscottilabs">GitHub</a>
-  </div>
-</div>
+    <div className="bsc-actions">
+      <a className="bsc-btn bsc-btn-primary" href="/introduction">
+        Start building <span className="bsc-arrow">→</span>
+      </a>
+      <a className="bsc-btn" href="https://biscotti.finance">
+        Open the app <span className="bsc-arrow">↗</span>
+      </a>
+    </div>
+  </section>
 
-<div className="bsc-code">
+  <section className="bsc-section">
+    <div className="bsc-section-intro">
+      <div>
+        <p className="bsc-overline">One connected protocol</p>
+        <h2>Every market primitive. One liquidity layer.</h2>
+      </div>
+      <p>
+        Efficient pools for every kind of pair, a router that finds the best
+        path between them, and incentive systems that turn passive liquidity
+        into productive capital.
+      </p>
+    </div>
 
-:::code-group
+    <div className="bsc-bento">
+      <a className="bsc-feature" href="/concentrated-liquidity">
+        <span className="bsc-feature-number">01 / PRECISION</span>
+        <span className="bsc-feature-arrow">↗</span>
+        <h3>Concentrated liquidity</h3>
+        <p>Put capital to work inside custom price ranges with NFT positions and three purpose-built fee tiers.</p>
+        <span className="bsc-wordmark">V3</span>
+      </a>
+      <a className="bsc-feature" href="/stable-pools">
+        <span className="bsc-feature-number">02 / EFFICIENCY</span>
+        <span className="bsc-feature-arrow">↗</span>
+        <h3>Stable pools</h3>
+        <p>Exchange like-priced assets through a low-slippage StableSwap curve built for capital efficiency.</p>
+        <span className="bsc-wordmark">≈</span>
+      </a>
+      <a className="bsc-feature" href="/smart-router">
+        <span className="bsc-feature-number">03 / EXECUTION</span>
+        <span className="bsc-feature-arrow">↗</span>
+        <h3>One intelligent router</h3>
+        <p>Find the strongest execution path across both AMM designs, then settle it atomically in one transaction.</p>
+        <span className="bsc-wordmark">↝</span>
+      </a>
+      <a className="bsc-feature" href="/farms">
+        <span className="bsc-feature-number">04 / INCENTIVES</span>
+        <span className="bsc-feature-arrow">↗</span>
+        <h3>Programmable rewards</h3>
+        <p>Deploy V3 positions or LP tokens into farms, or stake single assets through flexible Coffee Pools.</p>
+        <span className="bsc-wordmark">+</span>
+      </a>
+      <a className="bsc-feature" href="/connectkit">
+        <span className="bsc-feature-number">05 / ONBOARDING</span>
+        <span className="bsc-feature-arrow">↗</span>
+        <h3>ConnectKit</h3>
+        <p>Give users a polished path onchain with wallet connection, Circle sign-in, chain handling, and a customizable React interface.</p>
+        <span className="bsc-wordmark">⌁</span>
+      </a>
+      <a className="bsc-feature" href="/trading-battles">
+        <span className="bsc-feature-number">06 / COMPETITION</span>
+        <span className="bsc-feature-arrow">↗</span>
+        <h3>Trading battles</h3>
+        <p>Run seasonal onchain competitions with transparent scoring and Merkle-verified reward claims.</p>
+        <span className="bsc-wordmark">↑</span>
+      </a>
+    </div>
 
-```ts [quote.ts]
-// Quote USDC → EURC through the 0.05% pool
-const { result } = await client.simulateContract({
-  address: QUOTER_V2,
-  abi: quoterV2Abi,
-  functionName: 'quoteExactInputSingle',
-  args: [{
-    tokenIn: USDC,
-    tokenOut: EURC,
-    amountIn: 1_000_000_000n,
-    fee: 500,
-    sqrtPriceLimitX96: 0n,
-  }],
-})
-```
+    <div className="bsc-links">
+      <a className="bsc-link" href="/analytics"><span>Analytics</span><span>↗</span></a>
+      <a className="bsc-link" href="/coffee-pools"><span>Coffee pools</span><span>↗</span></a>
+      <a className="bsc-link" href="/token"><span>BSCT token</span><span>↗</span></a>
+      <a className="bsc-link" href="/developers/addresses"><span>Contracts</span><span>↗</span></a>
+    </div>
+  </section>
 
-```ts [swap.ts]
-// Execute via the Smart Router — exact input, atomic
-await wallet.writeContract({
-  address: SMART_ROUTER,
-  abi: smartRouterAbi,
-  functionName: 'exactInputSingle',
-  args: [{
-    tokenIn: USDC,
-    tokenOut: EURC,
-    fee: 500,
-    recipient: me,
-    amountIn,
-    amountOutMinimum,
-    sqrtPriceLimitX96: 0n,
-  }],
-})
-```
+  <section className="bsc-cta">
+    <span className="bsc-cta-mark">☕</span>
+    <h2>Built for the next<br />market on ARC.</h2>
+    <p>
+      Explore the architecture, integrate the contracts, or start routing
+      your first trade in minutes.
+    </p>
+    <div className="bsc-actions">
+      <a className="bsc-btn bsc-btn-primary" href="/quick-start">
+        Read the quick start <span className="bsc-arrow">→</span>
+      </a>
+      <a className="bsc-btn" href="https://github.com/biscottilabs">
+        View on GitHub <span className="bsc-arrow">↗</span>
+      </a>
+    </div>
+  </section>
 
-```ts [chain.ts]
-// ARC Testnet — native gas is USDC itself
-export const arcTestnet = defineChain({
-  id: 5042002,
-  name: 'ARC Testnet',
-  nativeCurrency: { name: 'USD Coin', symbol: 'USDC', decimals: 18 },
-  rpcUrls: { default: { http: [RPC_URL] } },
-})
-```
-
-:::
-
-</div>
-
-<p className="bsc-section-label">Explore the protocol</p>
-
-<div className="bsc-grid">
-  <a className="bsc-card" href="/concentrated-liquidity">
-    <strong>Concentrated Liquidity</strong>
-    <span>V3-style pools with custom price ranges, NFT positions and three fee tiers.</span>
-  </a>
-  <a className="bsc-card" href="/stable-pools">
-    <strong>Stable Pools</strong>
-    <span>Curve-style StableSwap for like-priced assets with near-zero slippage.</span>
-  </a>
-  <a className="bsc-card" href="/smart-router">
-    <strong>Smart Router</strong>
-    <span>One transaction, best execution — split routing across both AMMs.</span>
-  </a>
-  <a className="bsc-card" href="/farms">
-    <strong>Farms</strong>
-    <span>Stake V3 positions or LP tokens in MasterChef farms for BSCT emissions.</span>
-  </a>
-  <a className="bsc-card" href="/coffee-pools">
-    <strong>Coffee Pools</strong>
-    <span>Single-token staking — stake one token, earn another. No IL, no lock-up.</span>
-  </a>
-  <a className="bsc-card" href="/trading-battles">
-    <strong>Trading Battles</strong>
-    <span>Seasonal competitions with Merkle-verified on-chain reward claims.</span>
-  </a>
-  <a className="bsc-card" href="/analytics">
-    <strong>Analytics</strong>
-    <span>Volume, TVL, pair and token data from open subgraphs.</span>
-  </a>
-  <a className="bsc-card" href="/developers/integrate">
-    <strong>Build on Biscotti</strong>
-    <span>Addresses, ABIs and integration guides for every protocol contract.</span>
-  </a>
-</div>
-
-<div className="bsc-meta">
-  <span><b>2</b> AMM designs</span>
-  <span><b>3</b> fee tiers</span>
-  <span><b>1B</b> BSCT hard cap</span>
-  <span><b>100%</b> open source</span>
-  <span>AI-ready — <a href="/developers/ai">llms.txt</a></span>
-</div>
+  <footer className="bsc-footer">
+    <span>© 2026 Biscotti Finance · Open liquidity infrastructure</span>
+    <div className="bsc-footer-links">
+      <a href="/developers/security">Security</a>
+      <a href="/developers/ai">AI index</a>
+      <a href="https://x.com/biscottidex">X / Twitter</a>
+    </div>
+  </footer>
 
 </div>
