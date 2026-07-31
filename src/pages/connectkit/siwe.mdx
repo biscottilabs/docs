@@ -1,0 +1,193 @@
+---
+title: Sign-In with Ethereum
+description: Add secure SIWE sessions to a Next.js app with the Biscotti ConnectKit SIWE helper.
+---
+
+# Sign-In with Ethereum
+
+[`@biscottidex/connectkit-next-siwe`](https://www.npmjs.com/package/@biscottidex/connectkit-next-siwe)
+adds nonce-based Sign-In with Ethereum sessions to a Next.js application using
+`@biscottidex/connectkit`.
+
+The package has deliberately separate entry points:
+
+- `/client` contains the browser-safe `SIWEProvider` configuration;
+- `/server` contains Next.js API handlers, signature verification and
+  `iron-session`;
+- the package root has no export, preventing server dependencies from entering
+  a browser bundle.
+
+:::tip[Wallet connection versus authentication]
+Connecting proves that the browser can access a wallet. SIWE asks that wallet
+to sign a domain-bound message, verifies the signature on your server and
+creates an authenticated application session.
+:::
+
+## Install
+
+```bash
+bun add @biscottidex/connectkit-next-siwe
+```
+
+The helper uses `viem/siwe`; you do not need the standalone `siwe` package.
+Your application should already have `@biscottidex/connectkit`, Next.js, React
+and viem installed.
+
+## Environment variables
+
+```bash
+# .env.local
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=...
+SESSION_SECRET=replace_with_at_least_32_random_characters
+```
+
+`SESSION_SECRET` is server-only and must contain at least 32 characters. Generate
+it with a cryptographically secure password generator and never use a
+`NEXT_PUBLIC_` prefix.
+
+## Configure the client
+
+```tsx
+// src/utils/siweClient.ts
+import { configureClientSIWE } from
+  '@biscottidex/connectkit-next-siwe/client'
+
+export const siweClient = configureClientSIWE({
+  apiRoutePrefix: '/api/siwe',
+  statement: 'Sign in to prove you control this wallet.',
+})
+```
+
+Wrap `ConnectKitProvider` with the generated SIWE provider:
+
+```tsx
+// src/pages/_app.tsx
+import type { AppProps } from 'next/app'
+import { useState } from 'react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { createConfig, WagmiProvider } from 'wagmi'
+import {
+  ConnectKitProvider,
+  getDefaultConfig,
+} from '@biscottidex/connectkit'
+import { siweClient } from '../utils/siweClient'
+
+const config = createConfig(
+  getDefaultConfig({
+    appName: 'My app',
+    walletConnectProjectId:
+      process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!,
+  }),
+)
+
+export default function App({ Component, pageProps }: AppProps) {
+  const [queryClient] = useState(() => new QueryClient())
+
+  return (
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <siweClient.Provider>
+          <ConnectKitProvider>
+            <Component {...pageProps} />
+          </ConnectKitProvider>
+        </siweClient.Provider>
+      </QueryClientProvider>
+    </WagmiProvider>
+  )
+}
+```
+
+After a wallet connects, ConnectKit opens its SIWE step and signs the generated
+message. Set `options.disableSiweRedirect` on `ConnectKitProvider` only when
+your application will trigger `useSIWE().signIn()` itself.
+
+## Configure the server
+
+```ts
+// src/utils/siweServer.ts
+import { configureServerSideSIWE } from
+  '@biscottidex/connectkit-next-siwe/server'
+
+export const siweServer = configureServerSideSIWE({
+  session: {
+    cookieName: 'my-app-siwe',
+    password: process.env.SESSION_SECRET,
+    cookieOptions: {
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      httpOnly: true,
+    },
+  },
+})
+```
+
+Create the required catch-all Pages Router endpoint:
+
+```ts
+// src/pages/api/siwe/[...route].ts
+import { siweServer } from '../../../utils/siweServer'
+
+export default siweServer.apiRouteHandler
+```
+
+This serves:
+
+| Endpoint | Method | Purpose |
+| --- | --- | --- |
+| `/api/siwe/nonce` | `GET` | Creates or returns the session nonce. |
+| `/api/siwe/verify` | `POST` | Verifies the signed SIWE message and creates the session. |
+| `/api/siwe/session` | `GET` | Returns the authenticated address and chain ID. |
+| `/api/siwe/logout` | `GET` | Destroys the session. |
+
+:::warning[Next.js router support]
+Version `0.0.1` exposes a `NextApiHandler` and therefore targets the Next.js
+**Pages Router**. An App Router route handler needs an adapter for the Web
+`Request`/`Response` API.
+:::
+
+## Read authentication state
+
+```tsx
+import { useSIWE } from '@biscottidex/connectkit'
+
+export function AccountSession() {
+  const { data, isSignedIn, signIn, signOut } = useSIWE()
+
+  if (!isSignedIn) {
+    return <button onClick={signIn}>Sign in</button>
+  }
+
+  return (
+    <div>
+      <p>Signed in as {data?.address}</p>
+      <button onClick={signOut}>Sign out</button>
+    </div>
+  )
+}
+```
+
+## Server callbacks
+
+Use `afterNonce`, `afterVerify`, `afterSession` and `afterLogout` to integrate
+your database, audit logging or application session:
+
+```ts
+export const siweServer = configureServerSideSIWE({
+  session: {
+    password: process.env.SESSION_SECRET,
+  },
+  options: {
+    async afterVerify(_request, _response, session) {
+      console.info('SIWE verified', {
+        address: session.address,
+        chainId: session.chainId,
+      })
+    },
+  },
+})
+```
+
+Do not treat a wallet address as a secret. Do treat the session secret, session
+cookie and signed authentication request as security-sensitive data. Keep
+cookies secure in production, rotate compromised session secrets and validate
+authorization separately from authentication.

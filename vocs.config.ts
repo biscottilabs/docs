@@ -95,6 +95,10 @@ export default defineConfig({
           link: '/connectkit/sign-in-with-circle',
           badge: { text: 'new', variant: 'info' },
         },
+        {
+          text: 'Sign-In with Ethereum',
+          link: '/connectkit/siwe',
+        },
         { text: 'Chains & Environments', link: '/connectkit/chains' },
         { text: 'Customization', link: '/connectkit/customization' },
         { text: 'Troubleshooting', link: '/connectkit/troubleshooting' },
