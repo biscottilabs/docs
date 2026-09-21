@@ -1,0 +1,58 @@
+---
+title: How to Swap Tokens on Arc
+description: Swap USDC, EURC, cirBTC and other Arc tokens on Biscotti Finance in four steps. A one-minute tutorial for Arc Mainnet.
+---
+
+import { PageSchema } from '../../components/PageSchema'
+
+<PageSchema
+  path="/tutorials/swap"
+  title="How to Swap Tokens on Arc"
+  description="Swap USDC, EURC, cirBTC and other Arc tokens on Biscotti Finance in four steps. A one-minute tutorial for Arc Mainnet."
+/>
+
+# How to Swap on Arc [Four steps, about a minute]
+
+**You need:** a wallet on Arc Mainnet with USDC for gas.
+[Set one up](/arc-mainnet).
+
+::::steps
+
+### Open Swap and connect
+
+Go to [biscotti.finance/swap](https://biscotti.finance/swap) and press
+**Connect Wallet**. Check that the network reads **Arc Mainnet**.
+
+![The Biscotti swap page on Arc Mainnet](/tutorials/swap-connect.webp)
+
+### Pick your tokens
+
+Choose what you pay (**From**) and what you get (**To**). Search by name or
+paste a contract address.
+
+![The token list: USDC, EURC, USYC and cirBTC](/tutorials/swap-select-token.webp)
+
+### Enter an amount
+
+The quote appears as you type: the rate, the minimum you'll receive and the
+route.
+
+![A USDC to EURC quote with rate, minimum received and route](/tutorials/swap-quote.webp)
+
+### Swap
+
+Press **Swap**, then **Confirm Swap** in your wallet. The first time you sell
+a token, approve it once before the swap.
+
+::::
+
+## Good to know
+
+- **Gas is paid in USDC.**
+- **Check Min. received.** Big trades in small pools move the price.
+- **Slippage** is Auto (0.5%). If a swap fails because the price moved, raise
+  it slightly in ⚙ settings.
+- **Launchpad tokens** are hidden by default. Turn on **Show launchpad tokens**
+  in the token list, and check the address before you buy.
+
+Next: [Launch a token](/tutorials/launch-a-token)
