@@ -9,12 +9,12 @@ Biscotti Finance is a decentralized exchange (DEX) and token launchpad live
 on **Arc Mainnet** (chain ID `5042`), with every product on Arc Testnet
 (`5042002`). It combines two complementary AMM designs behind a single
 smart router, layers BSCT yield incentives on top, and adds a seasonal
-trading-competition system — all fully on-chain and open source.
+trading-competition system. All components are fully on-chain and open source.
 
 :::info[Native gas is USDC]
 On ARC, the native gas token **is** the ERC-20 USDC at
 `0x3600000000000000000000000000000000000000`. There is no wrapped-native token
-to manage — you pay gas and trade with the same asset.
+to manage. You pay gas and trade with the same asset.
 :::
 
 ## Products at a glance
@@ -23,11 +23,11 @@ to manage — you pay gas and trade with the same asset.
 | --- | --- | --- |
 | **Swap** | Trade any token pair with best-price execution across all pool types | [Swaps](/swap) |
 | **Launchpad** | Launch a token in one transaction, liquidity locked forever | [Launchpad](/launchpad) |
-| **Concentrated Liquidity** | Uniswap V3-style pools — LPs choose a price range and hold an NFT position | [Overview](/concentrated-liquidity) |
+| **Concentrated Liquidity** | Uniswap V3-style pools where LPs choose a price range and hold an NFT position | [Overview](/concentrated-liquidity) |
 | **Stable Pools** | Curve-style StableSwap pools for like-priced assets (e.g. USDC/EURC) | [Overview](/stable-pools) |
 | **Smart Router** | Splits a single trade across V3 and stable pools atomically | [Smart Router](/smart-router) |
 | **Farms** | Stake V3 positions or LP tokens to earn BSCT emissions | [Farms](/farms) |
-| **Coffee Pools** | Single-token staking — stake one token, earn another | [Coffee Pools](/coffee-pools) |
+| **Coffee Pools** | Single-token staking: stake one token and earn another | [Coffee Pools](/coffee-pools) |
 | **Trading Battles** | Seasonal trading competitions with Merkle-proof reward claims | [Trading Battles](/trading-battles) |
 | **Analytics** | Volume, TVL, pair and token data from open subgraphs | [Analytics](/analytics) |
 
@@ -43,8 +43,8 @@ No single AMM curve is optimal for every pair:
   close to the peg.
 
 The [Smart Router](/smart-router) hides this complexity: it quotes both pool
-types (and multi-hop paths through them) and executes the best route — or a
-split across several routes — in one transaction.
+types (and multi-hop paths through them) and executes the best route or a
+split across several routes in one transaction.
 
 ## The BSCT token
 

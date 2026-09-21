@@ -1,6 +1,6 @@
 ---
 title: SmartChef Pools
-description: Factory-deployed single-asset staking pools — stake token A, earn token B.
+description: Factory-deployed single-asset staking pools. Stake token A and earn token B.
 ---
 
 # SmartChef Pools
@@ -11,9 +11,9 @@ protocol partnerships and community reward campaigns.
 
 | | |
 | --- | --- |
-| Factory | `SmartChefFactory` — `0xd47aBc3c294d49750e7b4d21875eB1eCB8432171` |
+| Factory | `SmartChefFactory` (`0xd47aBc3c294d49750e7b4d21875eB1eCB8432171`) |
 | Pool implementation | `SmartChefInitializable` (minimal clones) |
-| Rewards | Pre-funded — the pool must hold the full reward budget |
+| Rewards | Pre-funded (the pool must hold the full reward budget) |
 
 :::tip[SmartChef vs. Coffee Pools]
 [Coffee Pools](/coffee-pools) are Biscotti's user-facing single-token staking
@@ -35,8 +35,8 @@ function deployPool(
 ) external returns (address pool);
 ```
 
-Each call deploys a minimal `SmartChefInitializable` clone — cheap to deploy,
-isolated per campaign. The deployer then transfers the full reward budget
+Each call deploys a minimal `SmartChefInitializable` clone that is cheap to deploy
+and isolated per campaign. The deployer then transfers the full reward budget
 (`rewardPerBlock × (bonusEndBlock − startBlock)`) to the pool address.
 
 ## Pool mechanics
@@ -48,10 +48,10 @@ accRewardPerShare += blocks × rewardPerBlock × PRECISION / stakedSupply
 pending            = user.amount × accRewardPerShare / PRECISION − user.rewardDebt
 ```
 
-- `deposit(amount)` — stake; also harvests pending rewards
-- `withdraw(amount)` — unstake; also harvests
-- `emergencyWithdraw()` — exit without rewards
-- `pendingReward(user)` — view pending rewards
+- `deposit(amount)`: stake and harvest pending rewards
+- `withdraw(amount)`: unstake and harvest pending rewards
+- `emergencyWithdraw()`: exit without rewards
+- `pendingReward(user)`: view pending rewards
 - Optional `poolLimitPerUser` caps each wallet's stake for fair launches
 
 :::warning[Rewards stop at `bonusEndBlock`]

@@ -1,11 +1,11 @@
 ---
-title: Stable Pools — Contract Reference
+title: "Stable Pools: Contract Reference"
 description: StableSwap contract addresses and full on-chain API.
 ---
 
 # Contract Reference [Stable Pools]
 
-## Addresses — ARC Testnet
+## Addresses: ARC Testnet
 
 | Contract | Address |
 | --- | --- |
@@ -46,7 +46,7 @@ function coins(uint256 i) external view returns (address);
 /// Current amplification coefficient
 function A() external view returns (uint256);
 
-/// Value of 1 LP token in invariant terms (1e18) — monotonically increasing
+/// Monotonically increasing value of 1 LP token in invariant terms (1e18)
 function get_virtual_price() external view returns (uint256);
 
 /// Output amount for swapping dx of coin i into coin j (fee included)
@@ -119,10 +119,10 @@ function getPairInfo(address tokenA, address tokenB)
 
 ## StableSwapRouter & InfoStableSwap
 
-- `StableSwapRouter` — standalone router for stable-only swaps. Most
+- `StableSwapRouter`: standalone router for stable-only swaps. Most
   integrations should use the [Smart Router](/smart-router) instead, which
   routes across both AMMs.
-- `InfoStableSwap` — read-only helper that batches pool balances, fees and LP
+- `InfoStableSwap`: read-only helper that batches pool balances, fees and LP
   supplies for UIs and indexers.
 
 ## StableSwapLP

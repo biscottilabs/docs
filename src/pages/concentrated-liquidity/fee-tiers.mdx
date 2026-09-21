@@ -5,7 +5,7 @@ description: The fee tiers available for concentrated liquidity pools and how to
 
 # Fee Tiers
 
-Every pair on Biscotti can have up to three concentrated-liquidity pools — one
+Every pair on Biscotti can have up to three concentrated-liquidity pools, one
 per fee tier. Each tier is a separate pool with its own liquidity, price and
 tick spacing.
 
@@ -18,8 +18,8 @@ tick spacing.
 | **1.00%** | `10000` | 200 | Exotic / long-tail assets |
 
 The fee parameter is expressed in hundredths of a basis point
-(`500 = 0.05%`). Tick spacing constrains where positions may start and end —
-see [Ticks & Price Ranges](/concentrated-liquidity/ticks-and-ranges).
+(`500 = 0.05%`). Tick spacing constrains where positions may start and end.
+See [Ticks & Price Ranges](/concentrated-liquidity/ticks-and-ranges).
 
 ## How fees flow
 
@@ -27,16 +27,16 @@ On every swap, the fee is deducted from the input amount and credited to
 `feeGrowthGlobal` for the pool. Only positions **in range at the moment of the
 swap** accrue a share, proportional to their fraction of active liquidity.
 Fees accumulate inside the position and are paid out when you call `collect`
-on the `NonfungiblePositionManager` — they do **not** auto-compound.
+on the `NonfungiblePositionManager`. They do **not** auto-compound.
 
 ## Choosing a tier as an LP
 
-- **Match the pair's volatility.** Stable pairs can't justify a 0.30% fee —
-  traders will route elsewhere; volatile pairs at 0.05% underprice the
+- **Match the pair's volatility.** Stable pairs can't justify a 0.30% fee because
+  traders will route elsewhere. Volatile pairs at 0.05% underprice the
   impermanent-loss risk you carry.
 - **Follow the liquidity.** The [Smart Router](/smart-router) routes to
   whichever tier gives traders the best all-in price. A tier with deep
-  liquidity attracts the volume — and the fees.
+  liquidity attracts the volume and the fees.
 - **Check Analytics.** [Info pages](/analytics) show per-pool volume and TVL
   so you can compare realized fee APR across tiers of the same pair.
 

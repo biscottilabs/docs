@@ -6,7 +6,7 @@ description: Minting, increasing, collecting fees from and removing concentrated
 # Managing Positions
 
 Concentrated-liquidity positions are **NFTs** minted by the
-`NonfungiblePositionManager`. This page walks the full lifecycle — in the app
+`NonfungiblePositionManager`. This page walks through the full lifecycle in the app
 and at the contract level.
 
 ## Position lifecycle
@@ -25,16 +25,16 @@ creates and initializes it.
 ### Earn
 
 While price is inside your range you accrue swap fees continuously. Fees sit
-inside the position until collected — they do not auto-compound.
+inside the position until collected. They do not auto-compound.
 
 Optionally, stake the NFT in a [V3 farm](/farms/v3-farms) to earn BSCT on top.
 
 ### Adjust
 
-- **Increase liquidity** — add more of both tokens to the same range.
-- **Decrease liquidity** — remove part of the position; the withdrawn tokens
+- **Increase liquidity**: add more of both tokens to the same range.
+- **Decrease liquidity**: remove part of the position; the withdrawn tokens
   become owed to you (collect them afterwards).
-- **Rebalance** — there is no "move range" operation; rebalancing means
+- **Rebalance**: there is no "move range" operation; rebalancing means
   removing liquidity and minting a new position at the new range.
 
 ### Collect & close
@@ -126,7 +126,7 @@ await walletClient.writeContract({
 :::warning[Both tokens need approval]
 Approve `token0` and `token1` to the position manager before minting or
 increasing. When staking in a farm, the NFT itself is transferred with
-`safeTransferFrom` — see [V3 Farms](/farms/v3-farms).
+`safeTransferFrom`. See [V3 Farms](/farms/v3-farms).
 :::
 
 ## Fees while staked in a farm

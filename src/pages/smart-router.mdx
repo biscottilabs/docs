@@ -1,12 +1,12 @@
 ---
 title: Smart Router
-description: BiscottiSmartRouter — atomic split routing across concentrated-liquidity and stable pools.
+description: Atomic split routing across concentrated-liquidity and stable pools with BiscottiSmartRouter.
 ---
 
 # Smart Router
 
 `BiscottiSmartRouter` is the single entry point for trades on Biscotti. It
-aggregates the two AMMs — Uniswap V3-style pools and Curve-style stable pools —
+aggregates the two AMMs (Uniswap V3-style pools and Curve-style stable pools)
 behind the `SwapRouter02` calling convention, so a single transaction can fan a
 trade across both pool types (**split routing**) and execute atomically.
 
@@ -27,7 +27,7 @@ instead of mis-executing.
 
 :::note[No native-wrap handling]
 `WETH9` is set to the sentinel `address(1)` because ARC's native gas token
-**is** the ERC-20 USDC at `0x3600…` — there is no real wrapped-native token,
+**is** the ERC-20 USDC at `0x3600…`. There is no real wrapped-native token,
 and the sentinel keeps any wrap/unwrap branch inert.
 :::
 
@@ -41,7 +41,7 @@ through V3 and StableSwap.
 ### Batching
 
 ```solidity
-/// SwapRouter02 dialect — shared deadline for the whole batch.
+/// SwapRouter02 dialect with a shared deadline for the whole batch.
 function multicall(uint256 deadline, bytes[] calldata data)
     external returns (bytes[] memory results);
 
@@ -106,7 +106,7 @@ function exactInputStableSwap(
 
 | Sentinel | Meaning |
 | --- | --- |
-| `address(2)` (`ADDRESS_THIS`) | Send output to the router itself — used to chain hops across pool types inside one `multicall` |
+| `address(2)` (`ADDRESS_THIS`) | Send output to the router itself to chain hops across pool types inside one `multicall` |
 
 A mixed route like *V3 hop → stable hop* encodes the first call with
 `recipient = address(2)` and the second call spends the router's balance,

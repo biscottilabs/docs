@@ -38,7 +38,7 @@ export CHAIN_ID=5042002
 
 ### V3 quote (QuoterV2)
 
-`QuoterV2` simulates the swap — always call it with `eth_call`, never
+`QuoterV2` simulates the swap. Always call it with `eth_call`, never
 on-chain:
 
 ```ts
@@ -68,7 +68,7 @@ const amountOut = await client.readContract({
 })
 ```
 
-Compare both quotes (and multi-hop paths) and route accordingly — this is
+Compare both quotes (and multi-hop paths) and route accordingly. This is
 exactly what the app's smart-router package does before encoding a
 [Smart Router](/smart-router) transaction.
 
@@ -97,7 +97,7 @@ await walletClient.writeContract({
 ```
 
 For split/mixed routes, encode multiple legs into
-`multicall(deadline, bytes[])` — full example in
+`multicall(deadline, bytes[])`. See the full example in
 [Smart Router](/smart-router#integration-example).
 
 ## Reading pool state
@@ -123,13 +123,13 @@ const virtualPrice = await client.readContract({
 ## Tracking farm rewards
 
 ```ts
-// Classic farm — pending BSCT
+// Classic farm: pending BSCT
 const pending = await client.readContract({
   address: MASTERCHEF_ERC20, abi: masterChefErc20Abi,
   functionName: 'pendingBsctt', args: [0n, user],
 })
 
-// V3 farm — all staked positions, then pending per position
+// V3 farm: all staked positions, then pending per position
 const tokenIds = await client.readContract({
   address: MASTERCHEF_V3, abi: masterChefV3Abi,
   functionName: 'getUserTokenIds', args: [user],

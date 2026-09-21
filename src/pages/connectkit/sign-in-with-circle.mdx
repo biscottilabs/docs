@@ -17,9 +17,9 @@ Read that guide alongside this page when configuring Circle or Google.
 
 When a user chooses **Sign in with Circle**, the modal first presents:
 
-1. **Continue with Google** — starts Google OAuth, returns to the app, resumes
+1. **Continue with Google**: starts Google OAuth, returns to the app, resumes
    wallet provisioning automatically and connects wagmi.
-2. **Email & one-time code** — collects an email address and continues through
+2. **Email & one-time code**: collects an email address and continues through
    Circle's hosted OTP verification flow.
 
 New users approve Circle's hosted wallet creation challenge. Returning users
@@ -184,16 +184,16 @@ provider options take precedence.
 | Option | Default | Purpose |
 | --- | --- | --- |
 | `enabled` | `true` | Feature flag; omitting `circle` disables the integration. |
-| `appId` | — | Public Circle App ID. |
-| `google.clientId` | — | Public Google OAuth Web client ID. |
+| `appId` | None | Public Circle App ID. |
+| `google.clientId` | None | Public Google OAuth Web client ID. |
 | `google.redirectUri` | current origin | Exact registered OAuth callback origin. |
 | `google.selectAccountPrompt` | `false` | Ask Google to show its account chooser. |
 | `methods` | `['google', 'email']` | Methods displayed in the first Circle screen. |
 | `defaultChainId` | first configured chain | Chain on which to provision/select the wallet. |
 | `endpoints.basePath` | `/api/circle` | Base URL of your server adapter. |
-| `endpoints.headers` | — | Static or generated headers for app authentication. |
-| `endpoints.fetchOptions` | — | Extra `fetch` options such as credentials. |
-| `adapter` | — | Replace the built-in HTTP adapter. |
+| `endpoints.headers` | None | Static or generated headers for app authentication. |
+| `endpoints.fetchOptions` | None | Extra `fetch` options such as credentials. |
+| `adapter` | None | Replace the built-in HTTP adapter. |
 | `chains` | built-in map | Add or override Circle blockchain identifiers. |
 | `feeLevel` | `MEDIUM` | Circle transaction fee strategy. |
 | `name` | `Sign in with Circle` | Connector label in the wallet list. |
@@ -317,9 +317,8 @@ The connector intentionally does not support:
 - `eth_sign`;
 - returning a signed-but-unbroadcast transaction;
 - contract deployment without a destination address;
-- caller-selected gas fields—configure `feeLevel` instead.
+- caller-selected gas fields (configure `feeLevel` instead).
 
 Sessions are stored per browser tab. The current integration does not
 automatically refresh Circle's session token, so users sign in again when it
 expires.
-

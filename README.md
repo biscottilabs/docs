@@ -1,10 +1,10 @@
-# Biscotti Finance — Documentation
+# Biscotti Finance Documentation
 
 <p>
   <img src="public/logo-mark.svg" alt="Biscotti" height="56" />
 </p>
 
-The official documentation for [Biscotti Finance](https://biscotti.finance) — a
+The official documentation for [Biscotti Finance](https://biscotti.finance), a
 community-driven DEX on the ARC network with concentrated liquidity, stable
 pools, a smart router, BSCT farms, coffee pools and on-chain trading battles.
 
@@ -50,7 +50,7 @@ docs/
 
 ## Content ground truth
 
-Docs are written against the actual protocol sources — keep them in sync:
+Docs are written against the actual protocol sources. Keep them in sync:
 
 | Source | Used for |
 | --- | --- |
@@ -61,11 +61,11 @@ Docs are written against the actual protocol sources — keep them in sync:
 
 ## Deployment
 
-The site deploys to Vercel on push to `main`. Vocs auto-detects Vercel — no
-extra configuration needed (build command `bun run build`, output `dist`).
+The site deploys to Vercel on push to `main`. Vocs auto-detects Vercel, so no
+extra configuration is needed (build command `bun run build`, output `dist`).
 
 ## Contributing
 
-Fixes and improvements are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
-Found a security issue? **Do not open a public issue** — see the
+Fixes and improvements are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md).
+Found a security issue? **Do not open a public issue**. See the
 [security section](CONTRIBUTING.md#security--bug-bounty).

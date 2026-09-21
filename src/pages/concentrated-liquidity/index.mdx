@@ -1,11 +1,11 @@
 ---
 title: Concentrated Liquidity
-description: Uniswap V3-style pools on Biscotti — custom price ranges, NFT positions and capital efficiency.
+description: Uniswap V3-style pools on Biscotti with custom price ranges, NFT positions and capital efficiency.
 ---
 
 # Concentrated Liquidity
 
-Biscotti's primary AMM is a full deployment of **Uniswap V3** — the
+Biscotti's primary AMM is a full deployment of **Uniswap V3**, the
 concentrated liquidity market maker. Instead of spreading capital across the
 entire price curve `(0, ∞)` like a classic AMM, each liquidity provider
 chooses a **price range** and concentrates capital where trading actually
@@ -22,20 +22,20 @@ happens.
 | Fee tiers | One | 0.05% / 0.30% / 1.00% |
 
 The result: traders get deeper effective liquidity (less price impact), and
-LPs earn more fees per dollar deposited — at the cost of actively choosing and
+LPs earn more fees per dollar deposited, at the cost of actively choosing and
 maintaining a range.
 
 ## Core mechanics
 
-- **Ranges & ticks** — prices are discretized into ticks; a position provides
+- **Ranges & ticks**: prices are discretized into ticks; a position provides
   liquidity between a lower and an upper tick. While the market price is
   inside your range, your capital earns fees; outside it, your position sits
   idle in a single asset. Details in
   [Ticks & Price Ranges](/concentrated-liquidity/ticks-and-ranges).
-- **Fee tiers** — each pair can have several pools at different fee levels
+- **Fee tiers**: each pair can have several pools at different fee levels
   suited to its volatility. Details in
   [Fee Tiers](/concentrated-liquidity/fee-tiers).
-- **NFT positions** — because every position has its own range, positions are
+- **NFT positions**: because every position has its own range, positions are
   non-fungible. The `NonfungiblePositionManager` mints an NFT that represents
   your position and collects your fees. Details in
   [Managing Positions](/concentrated-liquidity/managing-positions).
@@ -62,6 +62,6 @@ Addresses and full API in the
 [Contract Reference](/concentrated-liquidity/contracts).
 
 :::tip[New to concentrated liquidity?]
-Start with [Ticks & Price Ranges](/concentrated-liquidity/ticks-and-ranges) —
-everything else builds on those two concepts.
+Start with [Ticks & Price Ranges](/concentrated-liquidity/ticks-and-ranges).
+Everything else builds on those two concepts.
 :::

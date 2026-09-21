@@ -1,12 +1,12 @@
 ---
 title: Protocol Architecture
-description: How Biscotti's contracts fit together — AMMs, router, farms, staking and incentives.
+description: How Biscotti's AMMs, router, farms, staking and incentives fit together.
 ---
 
 # Protocol Architecture
 
 Biscotti is composed of five contract groups. Each is independently deployed
-and upgrades are performed by deploying new versions — there are no proxies in
+and upgrades are performed by deploying new versions. There are no proxies in
 the core protocol.
 
 ## System map
@@ -39,7 +39,7 @@ the core protocol.
                                      ▼
                           ┌──────────────────────┐
                           │    BiscottiToken     │
-                          │  BSCT — 1B hard cap  │
+                          │  BSCT: 1B hard cap   │
                           │  AccessControl       │
                           └──────────────────────┘
 
@@ -68,20 +68,20 @@ invariant that keeps slippage near zero around the peg. See the
 
 ### 3. Smart Router
 
-`BiscottiSmartRouter` exposes the `SwapRouter02` dialect the frontend encodes —
+`BiscottiSmartRouter` exposes the `SwapRouter02` dialect the frontend encodes:
 `multicall(uint256,bytes[])`, `exactInputSingle`, `exactInput`, and the
-Biscotti-specific `exactInputStableSwap` — so one transaction can fan a trade
+Biscotti-specific `exactInputStableSwap`. This lets one transaction fan a trade
 across V3 and stable pools and settle atomically. Details in
 [Smart Router](/smart-router).
 
 ### 4. Yield layer
 
-- **[MasterChefERC20](/farms/classic-farms)** — classic per-block MasterChef
+- **[MasterChefERC20](/farms/classic-farms)**: classic per-block MasterChef
   for ERC-20 LP tokens (stable LP today, any future classic LP).
-- **[MasterChefV3](/farms/v3-farms)** — NFT-based farm for V3 positions.
+- **[MasterChefV3](/farms/v3-farms)**: NFT-based farm for V3 positions.
   Deploys one `MasterChefV3LmPool` per incentivized pool to track in-range
   liquidity with tick-level accounting.
-- **[SmartChef](/farms/smartchef)** and **[Coffee Pools](/coffee-pools)** —
+- **[SmartChef](/farms/smartchef)** and **[Coffee Pools](/coffee-pools)**:
   single-token "stake A, earn B" pools created by factories.
 
 Both MasterChefs hold `MINTER_ROLE` on `BiscottiToken` and mint BSCT emissions
@@ -105,6 +105,6 @@ allocation with a proof.
 ## Trust model
 
 - Core AMM contracts (V3, StableSwap pools) are immutable once deployed.
-- Farm emission rates, pool weights and reward periods are owner-controlled —
-  see [Security Notes](/developers/security) for the current admin surface and
+- Farm emission rates, pool weights and reward periods are owner-controlled.
+  See [Security Notes](/developers/security) for the current admin surface and
   hardening roadmap.

@@ -1,16 +1,16 @@
 ---
 title: Classic Farms
-description: MasterChefERC20 — stake ERC-20 LP tokens (stable LP) and earn per-block BSCT emissions.
+description: Stake ERC-20 LP tokens (stable LP) in MasterChefERC20 and earn per-block BSCT emissions.
 ---
 
 # Classic Farms
 
-`MasterChefERC20` is a per-block MasterChef for **fungible LP tokens** — today
-that means [stable-pool LP](/stable-pools), and any future classic AMM LP.
+`MasterChefERC20` is a per-block MasterChef for **fungible LP tokens**. Today,
+that means [stable-pool LP](/stable-pools), with support for any future classic AMM LP.
 
 | | |
 | --- | --- |
-| Contract | `MasterChefERC20` — `0x70b9144e1378d872063d2BBfCA61f378A9b2d163` |
+| Contract | `MasterChefERC20` (`0x70b9144e1378d872063d2BBfCA61f378A9b2d163`) |
 | Stake | ERC-20 LP tokens (`StableSwapLP`) |
 | Rewards | BSCT, minted per block |
 
@@ -122,11 +122,11 @@ farmAPR = bscttPerBlock × blocksPerYear × (allocPoint / totalAllocPoint) × bs
         stakedLpSupply × lpTokenPrice
 ```
 
-For stable LP, `lpTokenPrice ≈ virtualPrice × pegPrice` — see
+For stable LP, `lpTokenPrice ≈ virtualPrice × pegPrice`. See
 [Providing Liquidity](/stable-pools/providing-liquidity#how-value-accrues-virtual-price).
 
-## Live classic farms — ARC Testnet
+## Live classic farms: ARC Testnet
 
 | pid | LP | Alloc points |
 | --- | --- | --- |
-| 0 | USDC/EURC stable LP — `0x225057406e3C7D3f3196EC13fC82ed04E2D647Dd` | 100 |
+| 0 | USDC/EURC stable LP (`0x225057406e3C7D3f3196EC13fC82ed04E2D647Dd`) | 100 |

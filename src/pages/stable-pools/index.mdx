@@ -1,13 +1,13 @@
 ---
 title: Stable Pools
-description: Curve-style StableSwap pools on Biscotti — near-zero slippage for like-priced assets.
+description: Curve-style StableSwap pools on Biscotti with near-zero slippage for like-priced assets.
 ---
 
 # Stable Pools
 
 Stable pools are Biscotti's second AMM: two-coin **StableSwap** pools built
-for assets that should trade near parity — stablecoin pairs like USDC/EURC,
-or wrapped/liquid-staked variants of the same asset.
+for assets that should trade near parity, including stablecoin pairs like
+USDC/EURC or wrapped/liquid-staked variants of the same asset.
 
 ## Why a different curve?
 
@@ -20,10 +20,10 @@ price):
 A·n^n·Σxᵢ + D = A·D·n^n + D^(n+1) / (n^n·Πxᵢ)
 ```
 
-- `D` — the invariant: total value of the pool when balanced
-- `A` — the **amplification coefficient**: how strongly the pool behaves like
-  a constant-sum curve near the peg
-- `n = 2` — number of coins in a Biscotti pool
+- `D`: the invariant, representing the total value of the pool when balanced
+- `A`: the **amplification coefficient**, which controls how strongly the pool
+  behaves like a constant-sum curve near the peg
+- `n = 2`: the number of coins in a Biscotti pool
 
 While the pool is balanced, swaps execute almost 1:1. If one side is drained,
 the curve smoothly degrades toward constant-product pricing, so the pool never
@@ -63,13 +63,13 @@ balance (there is no separate claim step for stable-pool fees).
 
 Each pool has a companion `StableSwapLP` ERC-20. Unlike
 [concentrated liquidity](/concentrated-liquidity) NFTs, stable LP tokens are
-fungible — deposit any mix of the two coins and receive LP tokens
+fungible. Deposit any mix of the two coins and receive LP tokens
 proportional to the value you added.
 
 Stake the LP token in a [classic farm](/farms/classic-farms) to earn BSCT on
 top of swap fees.
 
-## Deployed pools — ARC Testnet
+## Deployed pools: ARC Testnet
 
 | Pool | Swap contract | LP token |
 | --- | --- | --- |
@@ -80,7 +80,7 @@ Infrastructure addresses (factory, router, info helper) are in the
 
 ## Learn more
 
-- [Providing Liquidity](/stable-pools/providing-liquidity) — deposit, withdraw
+- [Providing Liquidity](/stable-pools/providing-liquidity): deposits, withdrawals
   and the virtual price
-- [Creating a Pool](/stable-pools/creating-a-pool) — how new pairs are added
-- [Contract Reference](/stable-pools/contracts) — full on-chain API
+- [Creating a Pool](/stable-pools/creating-a-pool): how new pairs are added
+- [Contract Reference](/stable-pools/contracts): full on-chain API

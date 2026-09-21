@@ -78,7 +78,7 @@ forge script script/DeployRewardDistributor.s.sol --rpc-url $RPC_URL --broadcast
 
 After farms deploy, confirm both MasterChefs hold `MINTER_ROLE` (the script
 grants it when the deployer is token admin), then **revoke the deployer's
-minter role** — see [Security Notes](/developers/security).
+minter role**. See [Security Notes](/developers/security).
 
 ## 5. Create pools & farms
 
@@ -117,7 +117,7 @@ cast send $MASTERCHEF_V3 "add(uint256,address,bool)" \
 ## 6. Fund a V3 reward period
 
 ```bash
-# 10,000 BSCT over 7 days — MasterChefV3 mints this itself
+# Fund 10,000 BSCT over 7 days. MasterChefV3 mints this itself.
 cast send $MASTERCHEF_V3 "upkeep(uint256,uint256)" \
   10000000000000000000000 604800 \
   --rpc-url $RPC_URL --private-key $PRIVATE_KEY
@@ -144,7 +144,7 @@ forge script script/DeployUniswapV3.s.sol \
 
 ## Record the deployment
 
-Update `contract/deployments/<network>.json` after each deploy — the frontend
+Update `contract/deployments/<network>.json` after each deploy. The frontend
 and these docs read from it. Current testnet state:
 [Contract Addresses](/developers/addresses).
 

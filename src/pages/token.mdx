@@ -1,6 +1,6 @@
 ---
 title: BSCT Token
-description: BiscottiToken (BSCT) — the protocol reward token with a 1B hard cap and role-gated minting.
+description: BiscottiToken (BSCT) is the protocol reward token with a 1B hard cap and role-gated minting.
 ---
 
 # BSCT Token
@@ -28,7 +28,7 @@ emission contracts:
 - [`MasterChefV3`](/farms/v3-farms) mints in bulk via `upkeep()` to fund
   fixed-duration reward periods for V3 position staking.
 
-The hard cap is enforced at the token level — no combination of minters can
+The hard cap is enforced at the token level. No combination of minters can
 push total supply past 1B BSCT.
 
 :::warning[Admin surface]
@@ -85,13 +85,13 @@ strategy, ultimately leading to a deflationary BSCT token.
 
 ### What drives burns
 
-Burns are driven by every product in the Biscotti ecosystem — specifically, a
+Burns are driven by every product in the Biscotti ecosystem, specifically by a
 large share of fees from:
 
 | Product | Burn contribution |
 | --- | --- |
-| **Spot trading — stable pools** | Up to 50% of every stable swap fee (the protocol's admin-fee share) |
-| **Spot trading — concentrated liquidity** | A protocol share of V3 trading fees (activating at mainnet) |
+| **Spot trading in stable pools** | Up to 50% of every stable swap fee (the protocol's admin-fee share) |
+| **Spot trading in concentrated liquidity pools** | A protocol share of V3 trading fees (activating at mainnet) |
 | **Trading Battles** | Unclaimed season rewards recovered after each claim deadline |
 | **Coffee Pool campaigns** | A share of partner campaign fees |
 
@@ -102,8 +102,8 @@ is independently auditable.
 
 Emissions are carefully managed to ensure liquidity is directed to the most
 productive pools and products. Biscotti's focus is on scaling volume growth
-by optimizing liquidity incentives and boosting revenue per BSCT spent —
-every emission decision revolves around creating real revenue and long-term
+by optimizing liquidity incentives and boosting revenue per BSCT spent.
+Every emission decision revolves around creating real revenue and long-term
 success for the entire community.
 
 Products that receive BSCT emissions:
@@ -115,13 +115,13 @@ Products that receive BSCT emissions:
 | **Coffee Pools** | Funded pool budgets |
 | **Ecosystem growth** | Trading battles, partnerships, listings |
 
-Live weights are always readable on-chain via allocation points — see
+Live weights are always readable on-chain via allocation points. See
 [Farms](/farms).
 
 ### Does BSCT have a hard cap?
 
 Yes. BSCT has a hard cap of **1,000,000,000 (1B)**, enforced directly in the
-token contract — no minter, present or future, can exceed it. Emission
+token contract. No minter, present or future, can exceed it. Emission
 contracts mint *within* the cap; the cap itself can only decrease through
 burns, never increase.
 
@@ -129,7 +129,7 @@ burns, never increase.
 
 1. Open the BSCT token contract
    (`0x6AD77e153f6D4Dd7c0F2e194A385e625274dE794`) on the ARC block explorer
-   and check how much BSCT is held by the burn address — that is the total
+   and check how much BSCT is held by the burn address. That is the total
    amount removed from circulation forever, impossible to ever retrieve.
 2. Subtract the burned amount from the **Total Supply** the explorer shows.
 
@@ -137,18 +137,18 @@ This gives you the actual circulating BSCT supply.
 
 ### How is BSCT supply reduced?
 
-The goal is for deflation to run **higher than emission** — more BSCT leaving
-circulation than being produced — by building deflationary mechanisms into
-every Biscotti product. Buy-back-and-burn activates with ARC Mainnet, with
-emission reductions phased in as fee revenue grows: emissions bootstrap
-liquidity early, revenue sustains rewards later. See the
-[Roadmap](/roadmap).
+The goal is for deflation to run **higher than emission**, with more BSCT
+leaving circulation than being produced. Biscotti aims to achieve this by
+building deflationary mechanisms into every product. Buy-back-and-burn
+activates with ARC Mainnet, with emission reductions phased in as fee revenue
+grows: emissions bootstrap liquidity early, and revenue sustains rewards
+later. See the [Roadmap](/roadmap).
 
 ## Utility
 
 | Use | Where |
 | --- | --- |
-| Farm rewards | [Farms](/farms) — emissions for LP and V3 position staking |
-| Coffee pool rewards | [Coffee Pools](/coffee-pools) — earned on staked tokens |
-| Trading battle prizes | [Trading Battles](/trading-battles) — Merkle-claimed season rewards |
-| Governance (planned) | Emission weights and burn parameters — see [Roadmap](/roadmap) |
+| Farm rewards | [Farms](/farms): emissions for LP and V3 position staking |
+| Coffee pool rewards | [Coffee Pools](/coffee-pools): earned on staked tokens |
+| Trading battle prizes | [Trading Battles](/trading-battles): Merkle-claimed season rewards |
+| Governance (planned) | Emission weights and burn parameters; see [Roadmap](/roadmap) |

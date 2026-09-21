@@ -1,5 +1,5 @@
 ---
-title: Concentrated Liquidity — Contract Reference
+title: "Concentrated Liquidity: Contract Reference"
 description: Biscotti Finance V3 concentrated-liquidity contracts on Arc Mainnet and Arc Testnet, with their key entry points.
 ---
 
@@ -8,7 +8,7 @@ description: Biscotti Finance V3 concentrated-liquidity contracts on Arc Mainnet
 The concentrated-liquidity suite is a full deployment of Uniswap V3 Core +
 Periphery, owned by Biscotti, on Arc Mainnet and Arc Testnet.
 
-## Addresses — Arc Mainnet
+## Addresses: Arc Mainnet
 
 | Contract | Address |
 | --- | --- |
@@ -20,7 +20,7 @@ Periphery, owned by Biscotti, on Arc Mainnet and Arc Testnet.
 
 All mainnet addresses: [Contract Addresses](/developers/addresses).
 
-## Addresses — ARC Testnet
+## Addresses: ARC Testnet
 
 | Contract | Address |
 | --- | --- |
@@ -65,7 +65,7 @@ function liquidity() external view returns (uint128);
 function fee() external view returns (uint24);
 function tickSpacing() external view returns (int24);
 
-/// Low-level swap — integrators should prefer the Smart Router
+/// Low-level swap. Integrators should prefer the Smart Router.
 function swap(
     address recipient, bool zeroForOne,
     int256 amountSpecified, uint160 sqrtPriceLimitX96,
@@ -89,8 +89,8 @@ function createAndInitializePoolIfNecessary(
 
 ## QuoterV2
 
-Simulates swaps off-chain (call with `eth_call`, never on-chain — it is
-gas-intensive by design).
+Simulates swaps off-chain. Call with `eth_call`, never on-chain, because it is
+gas-intensive by design.
 
 ```solidity
 struct QuoteExactInputSingleParams {
@@ -130,6 +130,6 @@ function getPopulatedTicksInWord(address pool, int16 tickBitmapIndex)
 
 ## Related
 
-- [Smart Router](/smart-router) — the recommended swap entry point
-- [V3 Farms](/farms/v3-farms) — BSCT incentives for position NFTs
-- [Integration Guide](/developers/integrate) — end-to-end code samples
+- [Smart Router](/smart-router): the recommended swap entry point
+- [V3 Farms](/farms/v3-farms): BSCT incentives for position NFTs
+- [Integration Guide](/developers/integrate): end-to-end code samples

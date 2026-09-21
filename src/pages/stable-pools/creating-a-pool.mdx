@@ -10,7 +10,7 @@ swap contract and its LP token in one transaction and registers the pair for
 the [Smart Router](/smart-router).
 
 :::note[Permissioned creation]
-`createSwapPair` is `onlyOwner` — new stable pools are curated by the
+`createSwapPair` is `onlyOwner`, so new stable pools are curated by the
 protocol team. This is deliberate: a stable pool with a badly chosen `A` or a
 non-pegged pair gives LPs a false sense of safety. Want a pair listed? Reach
 out on [Telegram](https://t.me/+3gVQE9ZzFecwYzY0).
@@ -31,9 +31,9 @@ createSwapPair(tokenA, tokenB, A, fee, admin_fee)
 
 | Parameter | Deployed value (USDC/EURC) | Constraint |
 | --- | --- | --- |
-| `_A` — amplification | `200` | `< 1,000,000` |
-| `_fee` — swap fee | `4000000` (0.04%) | `≤ 5e9` (0.5%), denominator `1e10` |
-| `_admin_fee` — protocol share of the fee | `5000000000` (50%) | `≤ 1e10` (100%) |
+| `_A` (amplification) | `200` | `< 1,000,000` |
+| `_fee` (swap fee) | `4000000` (0.04%) | `≤ 5e9` (0.5%), denominator `1e10` |
+| `_admin_fee` (protocol share of the fee) | `5000000000` (50%) | `≤ 1e10` (100%) |
 
 ## Create a pool (owner)
 
@@ -77,7 +77,7 @@ cast send $MASTERCHEF_ERC20 "add(uint256,address,bool)" \
 
 ### Router picks it up automatically
 
-The Smart Router resolves stable pools from the factory on-chain — no router
+The Smart Router resolves stable pools from the factory on-chain, so no router
 change is needed for a new pair.
 
 ::::

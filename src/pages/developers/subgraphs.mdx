@@ -6,25 +6,25 @@ description: Public GraphQL endpoints for Biscotti's exchange analytics and trad
 # Subgraphs
 
 All Biscotti protocol data is indexed by two open-source subgraphs deployed on
-[The Graph](https://thegraph.com). The endpoints are public — every query on
-this page is ready to run, and powers the same numbers you see in the app.
+[The Graph](https://thegraph.com). The endpoints are public. Every query on
+this page is ready to run and powers the same numbers you see in the app.
 
 ## Endpoints & playgrounds
 
-Each endpoint has an interactive **GraphiQL playground** — open it in the
+Each endpoint has an interactive **GraphiQL playground**. Open it in the
 browser, paste any query from this page (or click a *Run it* link, which
 pre-fills the query for you) and press ▶.
 
 | Subgraph | Links |
 | --- | --- |
-| **Exchange Analytics** — pools, tokens, swaps, TVL, volume, fees (both AMMs) | [Playground ↗](https://api.studio.thegraph.com/query/1754761/subgraph-exchange-analytics-arc/version/latest/graphql) · [Query endpoint](https://api.studio.thegraph.com/query/1754761/subgraph-exchange-analytics-arc/version/latest) |
-| **Trading Battles** — seasons, per-wallet volume, leaderboards | [Playground ↗](https://api.studio.thegraph.com/query/1754761/trading-battles-arc/version/latest/graphql) · [Query endpoint](https://api.studio.thegraph.com/query/1754761/trading-battles-arc/version/latest) |
+| **Exchange Analytics**: pools, tokens, swaps, TVL, volume, fees (both AMMs) | [Playground ↗](https://api.studio.thegraph.com/query/1754761/subgraph-exchange-analytics-arc/version/latest/graphql) · [Query endpoint](https://api.studio.thegraph.com/query/1754761/subgraph-exchange-analytics-arc/version/latest) |
+| **Trading Battles**: seasons, per-wallet volume, leaderboards | [Playground ↗](https://api.studio.thegraph.com/query/1754761/trading-battles-arc/version/latest/graphql) · [Query endpoint](https://api.studio.thegraph.com/query/1754761/trading-battles-arc/version/latest) |
 
-Source code for both lives in the `subgraphs/` package of the repository —
-schemas, mappings and tests are fully open.
+Source code for both lives in the `subgraphs/` package of the repository.
+Schemas, mappings and tests are fully open.
 
 ```bash
-# Programmatic access — every example below works like this:
+# Programmatic access: every example below works like this:
 curl -s -X POST <QUERY_ENDPOINT> \
   -H "Content-Type: application/json" \
   -d '{"query": "<QUERY>"}'
@@ -32,8 +32,8 @@ curl -s -X POST <QUERY_ENDPOINT> \
 
 ## Exchange Analytics
 
-Indexes both AMMs — concentrated-liquidity (`v3`) and StableSwap (`stable`)
-pools — into one unified schema.
+Indexes both concentrated-liquidity (`v3`) and StableSwap (`stable`) pools
+into one unified schema.
 
 ### Entities
 
@@ -91,7 +91,7 @@ pools — into one unified schema.
 }
 ```
 
-Returns both AMMs side by side — e.g. the USDC/EURC 0.05% `v3` pool and the
+Returns both AMMs side by side, e.g. the USDC/EURC 0.05% `v3` pool and the
 USDC/EURC `stable` pool, ranked by locked value.
 
 [▶ Run it in the playground](https://api.studio.thegraph.com/query/1754761/subgraph-exchange-analytics-arc/version/latest/graphql?query=%7B%20pools%28first%3A%205%2C%20orderBy%3A%20totalValueLockedUSD%2C%20orderDirection%3A%20desc%29%20%7B%20id%20poolType%20feeTier%20token0%20%7B%20symbol%20%7D%20token1%20%7B%20symbol%20%7D%20totalValueLockedUSD%20volumeUSD%20%7D%20%7D)
@@ -150,7 +150,7 @@ USDC/EURC `stable` pool, ranked by locked value.
 
 ## Trading Battles
 
-Indexes every eligible swap into per-season, per-wallet stats — the same data
+Indexes every eligible swap into per-season, per-wallet stats, the same data
 that drives the live leaderboard and [season rewards](/trading-battles/rewards).
 
 ### Entities
@@ -190,7 +190,7 @@ that drives the live leaderboard and [season rewards](/trading-battles/rewards).
 
 [▶ Run it in the playground](https://api.studio.thegraph.com/query/1754761/trading-battles-arc/version/latest/graphql?query=%7B%20battleSeasons%20%7B%20slug%20startsAt%20endsAt%20totalVolumeUSD%20participantCount%20tradeCount%20%7D%20%7D)
 
-### Leaderboard — top traders
+### Leaderboard: top traders
 
 ```graphql
 {
@@ -204,7 +204,7 @@ that drives the live leaderboard and [season rewards](/trading-battles/rewards).
 }
 ```
 
-This is exactly how season rankings are computed — anyone can reproduce the
+This is exactly how season rankings are computed. Anyone can reproduce the
 leaderboard and verify their [reward allocation](/trading-battles/rewards)
 independently.
 

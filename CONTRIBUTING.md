@@ -1,7 +1,7 @@
 # Contributing to the Biscotti Docs
 
 Thanks for helping make Biscotti's documentation better! Contributions of all
-sizes are welcome — from typo fixes to whole new guides.
+sizes are welcome, from typo fixes to whole new guides.
 
 ## Quick start
 
@@ -29,7 +29,7 @@ sizes are welcome — from typo fixes to whole new guides.
 - **Accuracy first.** Docs must match the deployed contracts. Verify function
   signatures against `../contract/src/` and addresses against
   `../contract/deployments/arc-testnet.json` before writing them down.
-- **Every page needs frontmatter** — `title` and `description` are used for
+- **Every page needs frontmatter.** `title` and `description` are used for
   SEO, social cards and `llms.txt`:
 
   ```mdx
@@ -40,12 +40,12 @@ sizes are welcome — from typo fixes to whole new guides.
   ```
 
 - **Be honest about limitations.** Known issues and trust assumptions are
-  documented deliberately (see `/developers/security`) — don't remove them to
+  documented deliberately (see `/developers/security`). Don't remove them to
   make things look better.
 - **Use the house style:** callouts (`:::tip`, `:::warning`), steps
   (`::::steps`) for procedures, code groups (`:::code-group`) for
   alternatives, tables for enumerable facts.
-- Keep code samples runnable — prefer [viem](https://viem.sh) for TypeScript
+- Keep code samples runnable. Prefer [viem](https://viem.sh) for TypeScript
   and `cast` for CLI examples.
 
 ## What we're especially happy to receive
@@ -61,7 +61,7 @@ sizes are welcome — from typo fixes to whole new guides.
 - **App bugs** (something broken at biscotti.finance): open an issue in the
   relevant repository, or ping us on
   [Telegram](https://t.me/+3gVQE9ZzFecwYzY0).
-- **Security issues:** see below — never open a public issue.
+- **Security issues:** see below. Never open a public issue.
 
 ## Security & bug bounty
 
@@ -84,7 +84,7 @@ phase.
 **Rewards.** A formal, tiered bug-bounty program launches together with ARC
 Mainnet (see the [roadmap](https://docs.biscotti.finance/roadmap)). Until
 then, impactful findings reported responsibly are rewarded case-by-case in
-BSCT/USDC at the team's discretion — critical contract findings are taken
+BSCT/USDC at the team's discretion. Critical contract findings are taken
 especially seriously. Responsible reporters are credited (with consent) in
 the security notes.
 

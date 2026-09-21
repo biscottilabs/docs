@@ -1,6 +1,6 @@
 ---
 title: Swaps
-description: How token swaps work on Biscotti — routing, price impact, slippage and fees.
+description: How token swaps work on Biscotti, including routing, price impact, slippage and fees.
 ---
 
 # Swaps
@@ -16,14 +16,14 @@ price across every pool the protocol knows about.
 
 The app quotes your trade against all candidate routes:
 
-- **V3 pools** — each fee tier of each pair on the path (via `QuoterV2`)
-- **Stable pools** — Curve-style pools for like-priced assets (via `get_dy`)
-- **Multi-hop paths** — e.g. `TOKEN → USDC → EURC` when no direct pool exists
+- **V3 pools**: each fee tier of each pair on the path (via `QuoterV2`)
+- **Stable pools**: Curve-style pools for like-priced assets (via `get_dy`)
+- **Multi-hop paths**: e.g. `TOKEN → USDC → EURC` when no direct pool exists
 
 ### Route selection
 
-The [Smart Router](/smart-router) picks the route — or a **split** across
-several routes — that maximizes your output after fees and price impact.
+The [Smart Router](/smart-router) picks the route or a **split** across
+several routes that maximizes your output after fees and price impact.
 
 ### Execution
 
@@ -40,7 +40,7 @@ minimum-received amount (slippage tolerance) is enforced on-chain.
 | V3 pool | 0.05% / 0.30% / 1.00% depending on [fee tier](/concentrated-liquidity/fee-tiers) | In-range LPs |
 | Stable pool | 0.04% (configurable per pool) | LPs, minus admin share |
 
-Fees accrue to liquidity providers, not the protocol router — the Smart Router
+Fees accrue to liquidity providers, not the protocol router. The Smart Router
 itself charges nothing.
 
 ## Price impact vs. slippage

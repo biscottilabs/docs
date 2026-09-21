@@ -1,5 +1,5 @@
 ---
-title: Coffee Pools — Contract Reference
+title: "Coffee Pools: Contract Reference"
 description: CoffeePool and CoffeePoolFactory on-chain API.
 ---
 
@@ -7,7 +7,7 @@ description: CoffeePool and CoffeePoolFactory on-chain API.
 
 Source: `src/coffee-pools/CoffeePool.sol`, `src/coffee-pools/CoffeePoolFactory.sol`
 
-## Addresses — ARC Testnet
+## Addresses: ARC Testnet
 
 | Contract | Address |
 | --- | --- |
@@ -49,7 +49,7 @@ function deposit(uint256 amount) external nonReentrant;
 /// Reverts with InsufficientStakedBalance if amount > stake.
 function withdraw(uint256 amount) external nonReentrant;
 
-/// Exit without rewards — forfeits all pending rewards.
+/// Exit without rewards, forfeiting all pending rewards.
 function emergencyWithdraw() external nonReentrant;
 
 /// Pending rewards for a user, simulated to the current block.
@@ -83,7 +83,7 @@ function recoverNonPoolToken(IERC20 token, uint256 amount, address to) external 
 
 :::info[Principal is protected]
 `recoverRewardTokens` and `recoverNonPoolToken` are written so the owner can
-never withdraw users' staked tokens — recovery of the staked token address is
+never withdraw users' staked tokens. Recovery of the staked token address is
 explicitly rejected (`CannotRecoverStakedToken`).
 :::
 
@@ -132,5 +132,5 @@ event CoffeePoolCreated(
 ```
 
 After creating a pool, the operator transfers the full reward budget
-(`rewardPerBlock × (endBlock − startBlock)`) to the pool address — emissions
+(`rewardPerBlock × (endBlock − startBlock)`) to the pool address. Emissions
 are paid from the pool's balance, not minted.

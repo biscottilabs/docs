@@ -1,5 +1,5 @@
 ---
-title: Providing Liquidity — Stable Pools
+title: "Providing Liquidity: Stable Pools"
 description: How to add and remove liquidity in Biscotti stable pools, and how LP value accrues.
 ---
 
@@ -15,7 +15,7 @@ earns fees.
 
 ### Choose amounts
 
-You can deposit **any ratio** — both coins, or just one. Depositing
+You can deposit **any ratio**, using both coins or just one. Depositing
 imbalanced amounts implicitly swaps part of your deposit into the scarcer
 coin, so a small fee applies to the imbalanced portion.
 
@@ -35,7 +35,7 @@ function add_liquidity(uint256[2] memory amounts, uint256 min_mint_amount)
     external;
 ```
 
-`min_mint_amount` is your slippage guard — the transaction reverts if fees or
+`min_mint_amount` is your slippage guard: the transaction reverts if fees or
 front-running would leave you with fewer LP tokens.
 
 ::::
@@ -48,7 +48,7 @@ the fee impact before you confirm.
 ## How value accrues: virtual price
 
 Stable-pool fees compound into the pool itself. The metric to watch is the
-**virtual price** — the value of 1 LP token measured in the pool's invariant:
+**virtual price**, the value of 1 LP token measured in the pool's invariant:
 
 ```solidity
 function get_virtual_price() external view returns (uint256); // 1e18 scale
@@ -86,16 +86,16 @@ function calc_withdraw_one_coin(uint256 _token_amount, uint256 i)
 
 Stake your `StableSwapLP` tokens in the corresponding
 [classic farm](/farms/classic-farms) to earn BSCT emissions while still
-accruing swap fees — LP tokens keep compounding virtual price even while
+accruing swap fees. LP tokens keep compounding virtual price even while
 staked.
 
 ## Risks
 
 :::warning
-- **Peg risk** — if one asset permanently de-pegs, arbitrage drains the pool
+- **Peg risk**: if one asset permanently de-pegs, arbitrage drains the pool
   toward the failing asset and LPs end up holding mostly that asset.
-- **Amplification ramps** — governance can ramp `A` (bounded to 10× per ramp,
+- **Amplification ramps**: governance can ramp `A` (bounded to 10× per ramp,
   gradual by construction), which slightly shifts the curve.
-- **Smart-contract risk** — pools are immutable but unaudited on testnet; see
+- **Smart-contract risk**: pools are immutable but unaudited on testnet; see
   [Security Notes](/developers/security).
 :::

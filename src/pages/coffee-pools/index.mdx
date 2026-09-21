@@ -1,17 +1,17 @@
 ---
 title: Coffee Pools
-description: Single-token staking on Biscotti — stake one token, earn another over a fixed period.
+description: Single-token staking on Biscotti. Stake one token and earn another over a fixed period.
 ---
 
 # Coffee Pools ☕
 
 Coffee Pools are Biscotti's simplest way to earn: **stake a single token, earn
-another**. No LP tokens, no price ranges, no impermanent loss — just deposit
-and harvest.
+another**. Simply deposit and harvest, with no LP tokens, price ranges or
+impermanent loss.
 
 | | |
 | --- | --- |
-| Factory | `CoffeePoolFactory` — `0x7F60DcB5C141EC03650469210A4C936aFbe5619F` |
+| Factory | `CoffeePoolFactory` (`0x7F60DcB5C141EC03650469210A4C936aFbe5619F`) |
 | Pool contract | `CoffeePool` (one per campaign) |
 | Typical setup | Stake USDC → earn BSCT |
 
@@ -55,14 +55,14 @@ Rewards don't compound automatically.
 
 ### Withdraw
 
-Withdraw part or all of your stake at any time — there is no lock-up.
+Withdraw part or all of your stake at any time. There is no lock-up.
 Withdrawal harvests pending rewards in the same transaction.
 
 ::::
 
 :::warning[Pools end]
 Rewards stop at the pool's `endBlock`. Your stake stays safe and withdrawable
-forever, but it earns nothing after the end — check the countdown in the app.
+forever, but it earns nothing after the end. Check the countdown in the app.
 :::
 
 ## APR
@@ -73,14 +73,14 @@ APR = rewardPerBlock × blocksPerYear × rewardTokenPrice
       totalStaked × stakedTokenPrice
 ```
 
-APR falls as more tokens are staked — early stakers in a fresh pool earn the
+APR falls as more tokens are staked, so early stakers in a fresh pool earn the
 most.
 
-## Live pools — ARC Testnet
+## Live pools: ARC Testnet
 
 | Pool | Stake | Earn | Reward/block |
 | --- | --- | --- | --- |
-| #1 — `0x58a66E62f38d2b897A3337F2298bD111c29e09FD` | USDC | BSCT | 0.01 BSCT |
-| #2 — `0xfdE503599321AFAE57f287EC02E5F4a94a9f37D3` | USDC | BSCT | ~0.00177 BSCT |
+| #1 (`0x58a66E62f38d2b897A3337F2298bD111c29e09FD`) | USDC | BSCT | 0.01 BSCT |
+| #2 (`0xfdE503599321AFAE57f287EC02E5F4a94a9f37D3`) | USDC | BSCT | ~0.00177 BSCT |
 
 Full contract API in the [Coffee Pools Reference](/coffee-pools/contracts).
