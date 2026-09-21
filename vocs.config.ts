@@ -22,6 +22,7 @@ export default defineConfig({
   ],
   topNav: [
     { text: 'Docs', link: '/introduction' },
+    { text: 'Tutorials', link: '/tutorials' },
     { text: 'Arc Tokens', link: '/arc-tokens' },
     { text: 'Launchpad', link: '/launchpad' },
     { text: 'ConnectKit', link: '/connectkit' },
@@ -41,6 +42,14 @@ export default defineConfig({
         { text: 'BSCT Token', link: '/token' },
         { text: 'Roadmap', link: '/roadmap', badge: { text: 'soon', variant: 'info' } },
         { text: 'Team', link: '/team' },
+      ],
+    },
+    {
+      text: 'Tutorials',
+      items: [
+        { text: 'All Tutorials', link: '/tutorials' },
+        { text: 'How to Swap', link: '/tutorials/swap' },
+        { text: 'How to Launch a Token', link: '/tutorials/launch-a-token', badge: { text: 'new', variant: 'info' } },
       ],
     },
     {
