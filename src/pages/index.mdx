@@ -1,6 +1,6 @@
 ---
-title: "Biscotti Finance: DEX & Token Launchpad on Arc"
-description: Biscotti Finance is the liquidity layer and token launchpad on Arc Mainnet. Trade, launch tokens with locked liquidity, earn and build on open markets.
+title: "Biscotti Finance: Arc Mainnet DEX & Token Launchpad"
+description: Trade and launch tokens on Arc Mainnet with Biscotti Finance. Explore Arc token addresses, concentrated liquidity, launchpad fees and protocol rewards.
 layout: minimal
 content:
   width: full
@@ -220,6 +220,8 @@ outline: false
     margin-bottom: 2.5rem;
   }
 
+  #bsc-landing .bsc-guides { margin-top: 5rem; }
+
   #bsc-landing .bsc-section-intro h2 {
     max-width: 530px;
     margin: 0;
@@ -431,6 +433,7 @@ outline: false
       '@graph': [
         {
           '@type': 'Organization',
+          '@id': 'https://biscotti.finance/#organization',
           name: 'Biscotti Finance',
           url: 'https://biscotti.finance',
           logo: 'https://docs.biscotti.finance/icon-512.png',
@@ -441,8 +444,22 @@ outline: false
         },
         {
           '@type': 'WebSite',
+          '@id': 'https://docs.biscotti.finance/#website',
           name: 'Biscotti Finance Docs',
-          url: 'https://docs.biscotti.finance',
+          alternateName: 'Biscotti Docs',
+          url: 'https://docs.biscotti.finance/',
+          inLanguage: 'en',
+          publisher: { '@id': 'https://biscotti.finance/#organization' },
+        },
+        {
+          '@type': 'WebPage',
+          '@id': 'https://docs.biscotti.finance/#webpage',
+          url: 'https://docs.biscotti.finance/',
+          name: 'Biscotti Finance: Arc Mainnet DEX & Token Launchpad',
+          description: 'Trade and launch tokens on Arc Mainnet with Biscotti Finance. Explore Arc token addresses, concentrated liquidity, launchpad fees and protocol rewards.',
+          inLanguage: 'en',
+          isPartOf: { '@id': 'https://docs.biscotti.finance/#website' },
+          about: { '@id': 'https://biscotti.finance/#organization' },
         },
       ],
     }),
@@ -458,13 +475,13 @@ outline: false
     </div>
 
     <h1 className="bsc-title">
-      Liquidity,<br /><span>without limits.</span>
+      Trade and launch<br /><span>tokens on Arc.</span>
     </h1>
 
     <p className="bsc-desc">
-      Biscotti is the open liquidity layer and token launchpad on Arc. Trade
-      with intelligent routing, launch tokens with liquidity locked forever,
-      and build with contracts designed for composability.
+      Biscotti Finance is the DEX and token launchpad on Arc Mainnet. Swap
+      tokens, provide concentrated liquidity, and launch a token with its
+      liquidity locked forever.
     </p>
 
     <div className="bsc-actions">
@@ -494,7 +511,7 @@ outline: false
       <a className="bsc-feature bsc-feature-wide" href="/launchpad">
         <span className="bsc-feature-number">NEW / LAUNCH</span>
         <span className="bsc-feature-arrow">↗</span>
-        <h3>Token launchpad on Arc</h3>
+        <h3>Token launchpad on Arc Mainnet</h3>
         <p>Launch a token in one transaction. Fixed supply, liquidity locked forever, no team allocation, and 70% of trading fees to the creator.</p>
         <span className="bsc-wordmark">1B</span>
       </a>
@@ -547,6 +564,26 @@ outline: false
       <a className="bsc-link" href="/coffee-pools"><span>Coffee pools</span><span>↗</span></a>
       <a className="bsc-link" href="/token"><span>BSCT token</span><span>↗</span></a>
       <a className="bsc-link" href="/developers/addresses"><span>Contracts</span><span>↗</span></a>
+    </div>
+  </section>
+
+  <section className="bsc-section bsc-guides" aria-labelledby="arc-guides">
+    <div className="bsc-section-intro">
+      <div>
+        <p className="bsc-overline">Explore the Arc ecosystem</p>
+        <h2 id="arc-guides">Arc Mainnet guides.</h2>
+      </div>
+      <p>
+        Connect a wallet, find Arc token addresses, and learn how to trade
+        or create a token on Biscotti. Understand which products are live
+        on mainnet and how protocol rewards work.
+      </p>
+    </div>
+    <div className="bsc-links">
+      <a className="bsc-link" href="/arc-mainnet"><span>Arc Mainnet setup</span><span>→</span></a>
+      <a className="bsc-link" href="/arc-tokens"><span>Arc tokens &amp; addresses</span><span>→</span></a>
+      <a className="bsc-link" href="/launchpad"><span>Launch a token on Arc</span><span>→</span></a>
+      <a className="bsc-link" href="/arc-airdrop"><span>Airdrop questions &amp; rewards</span><span>→</span></a>
     </div>
   </section>
 

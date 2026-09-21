@@ -7,6 +7,9 @@ import type { PathsForPages } from 'waku/router'
 type Page =
   | { path: '/_api/api/og'; render: 'static' }
   | { path: '/analytics'; render: 'static' }
+  | { path: '/arc-airdrop'; render: 'static' }
+  | { path: '/arc-mainnet'; render: 'static' }
+  | { path: '/arc-tokens'; render: 'static' }
   | { path: '/architecture'; render: 'static' }
   | { path: '/coffee-pools/contracts'; render: 'static' }
   | { path: '/coffee-pools'; render: 'static' }

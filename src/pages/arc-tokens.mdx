@@ -1,0 +1,94 @@
+---
+title: Arc Tokens & Mainnet Contract Addresses
+description: Find Arc Mainnet tokens, check USDC, EURC, USYC and cirBTC contract addresses, and learn how to trade or launch tokens with Biscotti Finance.
+---
+
+import { PageSchema } from '../components/PageSchema'
+
+<PageSchema
+  path="/arc-tokens"
+  title="Arc Tokens & Mainnet Contract Addresses"
+  description="Find Arc Mainnet tokens, check USDC, EURC, USYC and cirBTC contract addresses, and learn how to trade or launch tokens with Biscotti Finance."
+/>
+
+# Tokens on Arc Mainnet
+
+Arc supports stablecoins, tokenized assets, and tokens created by applications
+and their users. **Biscotti Finance** provides a DEX and token launchpad for
+trading and creating tokens on Arc Mainnet.
+
+Use this guide to identify a token by its network and contract address,
+understand its role, and find the appropriate trading or launch guide.
+
+## Arc Mainnet token addresses
+
+These are the assets recorded in Biscotti's
+[mainnet deployment reference](/developers/addresses). They are a starting
+list, not a complete directory of every token on Arc. An address in this
+table does not mean that every pair has liquidity on Biscotti.
+
+| Token | Role | Arc Mainnet contract address |
+| --- | --- | --- |
+| USDC | US dollar stablecoin and Arc's gas currency | `0x3600000000000000000000000000000000000000` |
+| EURC | Euro stablecoin | `0xbEf5f6d51CB62b58e6A8f77868681825C6fe21c1` |
+| USYC | Tokenized fund asset | `0x8a5D989Bbb96929F689B0200f435f53dA42bF490` |
+| cirBTC | Circle Wrapped Bitcoin | `0x171A4217b86A807A64eB94757Db6849fb4bDbAA0` |
+
+Arc's [mainnet launch announcement](https://www.arc.io/blog/arc-economic-os-internet)
+describes the Circle assets available in the ecosystem. Asset-specific
+transfer or access rules still apply.
+
+## Check a token before importing it
+
+A token symbol is not a unique identifier. Different contracts can use the
+same name or symbol, and the same symbol can appear on several networks.
+
+1. Confirm that your wallet is on Arc Mainnet, chain ID `5042`.
+2. Copy the contract address from the issuer or the relevant deployment record.
+3. Look up that address in [Arc Explorer](https://explorer.arc.io) and check
+   the contract and token details.
+4. Compare the address with the token selected in Biscotti before approving
+   a transaction.
+
+For tokens created through Biscotti, use the token's launch page and the
+[launchpad contract reference](/launchpad/contracts) to identify its pool and
+contracts. The [launchpad safety guide](/launchpad/safety) explains the
+liquidity lock and the limits of that protection.
+
+## How to trade Arc tokens
+
+Connect to [Biscotti Finance](https://biscotti.finance), select Arc Mainnet,
+and choose a pair in **Swap**. The quote depends on the liquidity available
+for the route and the size of your trade.
+
+Review the output amount, price impact, and slippage setting before confirming.
+Keep some USDC available for gas. See the [Arc Mainnet wallet guide](/arc-mainnet)
+for setup and the [swap guide](/swap) for how execution works.
+
+## Create your own token on Arc
+
+The [Biscotti launchpad](/launchpad) creates a fixed-supply token with a USDC
+liquidity pool. All one billion tokens enter the launch pool, with no team
+allocation or presale. The liquidity positions remain locked in the vault.
+
+Creators choose between [Standard and Moon curves](/launchpad/curves) and
+select a [fee mode](/launchpad/fees). The launch flow can include an optional
+first purchase in the same transaction.
+
+## BSCT, gas tokens, and testnet assets
+
+[BSCT](/token) is Biscotti's protocol reward token. It is separate from USDC,
+which pays for gas, and from the individual tokens created through the
+launchpad. The current BSCT deployment is on Arc Testnet; its mainnet rollout
+is tracked on the [Roadmap](/roadmap).
+
+Arc Testnet uses chain ID `5042002`. Its test tokens and contract deployments
+are separate from mainnet. Use the [testnet quick start](/quick-start) to
+experiment with swaps and rewards.
+
+## Arc token and airdrop questions
+
+Finding a token on Arc, using a faucet, or holding BSCT does not establish
+eligibility for an Arc airdrop. Each reward program needs its own published
+rules. See [Arc airdrop questions](/arc-airdrop) for official information
+sources and the rewards documented by Biscotti.

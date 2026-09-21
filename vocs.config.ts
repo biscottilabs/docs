@@ -2,10 +2,10 @@ import { defineConfig } from 'vocs/config'
 
 export default defineConfig({
   title: 'Biscotti Finance',
-  // Brand in every title: "Token Launchpad on Arc – Biscotti Finance".
-  titleTemplate: '%s – Biscotti Finance',
+  // Vocs adds the brand only when the page title does not already contain it.
+  titleTemplate: '%s | Biscotti Finance',
   description:
-    'Documentation for Biscotti Finance, the DEX and token launchpad on Arc Mainnet: launch tokens with locked liquidity, concentrated liquidity, stable pools, yield farms and trading battles.',
+    'Biscotti Finance guides for Arc Mainnet: trade tokens, launch a token with locked liquidity, find contract addresses and learn how protocol rewards work.',
   baseUrl: 'https://docs.biscotti.finance',
   accentColor: 'light-dark(#8a4b26, #e0a370)',
   logoUrl: { light: '/logo-light.svg', dark: '/logo-dark.svg' },
@@ -22,6 +22,7 @@ export default defineConfig({
   ],
   topNav: [
     { text: 'Docs', link: '/introduction' },
+    { text: 'Arc Tokens', link: '/arc-tokens' },
     { text: 'Launchpad', link: '/launchpad' },
     { text: 'ConnectKit', link: '/connectkit' },
     { text: 'Contracts', link: '/developers/addresses' },
@@ -32,8 +33,11 @@ export default defineConfig({
       text: 'Overview',
       items: [
         { text: 'What is Biscotti?', link: '/introduction' },
+        { text: 'Arc Mainnet Guide', link: '/arc-mainnet' },
+        { text: 'Arc Tokens & Addresses', link: '/arc-tokens' },
+        { text: 'Airdrop Questions & Rewards', link: '/arc-airdrop' },
         { text: 'Protocol Architecture', link: '/architecture' },
-        { text: 'Quick Start', link: '/quick-start' },
+        { text: 'Testnet Quick Start', link: '/quick-start' },
         { text: 'BSCT Token', link: '/token' },
         { text: 'Roadmap', link: '/roadmap', badge: { text: 'soon', variant: 'info' } },
         { text: 'Team', link: '/team' },

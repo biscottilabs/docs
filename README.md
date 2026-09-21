@@ -64,6 +64,30 @@ Docs are written against the actual protocol sources. Keep them in sync:
 The site deploys to Vercel on push to `main`. Vocs auto-detects Vercel, so no
 extra configuration is needed (build command `bun run build`, output `dist`).
 
+## Search indexing
+
+Vocs generates canonical URLs, page titles, descriptions, social cards,
+`robots.txt`, and `sitemap.xml` from `vocs.config.ts` and page frontmatter.
+The Arc guides are linked from the homepage and navigation so crawlers can
+discover them through normal links.
+
+After deploying content changes:
+
+1. Check [robots.txt](https://docs.biscotti.finance/robots.txt) and
+   [the sitemap](https://docs.biscotti.finance/sitemap.xml) on the live domain.
+2. In [Google Search Console](https://search.google.com/search-console), use
+   the verified domain or URL-prefix property for `https://docs.biscotti.finance/`
+   and submit `sitemap.xml`.
+3. Inspect `/`, `/arc-mainnet`, `/arc-tokens`, `/arc-airdrop`, and `/launchpad`
+   with URL Inspection, then request indexing for the updated pages.
+4. Track impressions, clicks, and queries in the Performance report. Treat
+   indexing and rankings as measured outcomes, not build-time guarantees.
+
+Keep airdrop and reward content tied to published program rules. Mainnet and
+testnet availability should match the deployment reference. See Google's
+[SEO starter guide](https://developers.google.com/search/docs/fundamentals/seo-starter-guide)
+for indexing and content guidance.
+
 ## Contributing
 
 Fixes and improvements are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md).

@@ -1,0 +1,103 @@
+---
+title: Arc Mainnet DEX & Wallet Guide
+description: Use Biscotti Finance on Arc Mainnet. Connect your wallet, fund it with USDC, trade tokens and launch a token with locked liquidity.
+---
+
+import { PageSchema } from '../components/PageSchema'
+
+<PageSchema
+  path="/arc-mainnet"
+  title="Arc Mainnet DEX & Wallet Guide"
+  description="Use Biscotti Finance on Arc Mainnet. Connect your wallet, fund it with USDC, trade tokens and launch a token with locked liquidity."
+/>
+
+# Biscotti Finance on Arc Mainnet
+
+Biscotti Finance is a decentralized exchange (DEX) and token launchpad on
+**Arc Mainnet**. Use it to swap tokens, provide concentrated liquidity, or
+launch a new token paired with USDC.
+
+Arc is an EVM-compatible Layer 1 blockchain that uses USDC for gas. Mainnet
+launched on September 16, 2026. See the
+[official Arc Mainnet announcement](https://www.arc.io/blog/arc-economic-os-internet).
+
+## Connect your wallet to Arc
+
+Open [Biscotti Finance](https://biscotti.finance), connect your wallet, and
+select Arc Mainnet. If your wallet needs a custom network, use these details:
+
+| Setting | Arc Mainnet |
+| --- | --- |
+| Network name | Arc |
+| Chain ID | `5042` |
+| RPC URL | `https://rpc.mainnet.arc.io` |
+| Gas currency | USDC |
+| Block explorer | [Arc Explorer](https://explorer.arc.io) |
+
+These settings come from the
+[Arc wallet connection guide](https://docs.arc.io/arc/references/connect-to-arc).
+Arc's native gas balance uses 18 decimals; applications reading an ERC-20
+token balance should use that token's contract interface.
+
+## Fund your wallet with USDC
+
+Keep USDC on **Arc Mainnet** to pay for transactions. A USDC balance on another
+network is a separate balance. Check that your funding provider supports Arc
+and that the destination is your wallet address.
+
+[Arc Portal](https://portal.arc.io) provides wallet funding and ecosystem
+discovery. Its [official getting-started guide](https://www.arc.io/blog/arc-portal-the-easiest-place-to-get-started-on-arc)
+explains the available funding flows. Testnet faucet tokens are for testing
+and cannot fund mainnet transactions.
+
+## Trade tokens on Biscotti
+
+1. Open the Biscotti app on Arc Mainnet and choose **Swap**.
+2. Select the input and output tokens. Use the [Arc token guide](/arc-tokens)
+   and [contract addresses](/developers/addresses) to check the assets.
+3. Enter an amount and review the quote, price impact, and minimum received.
+4. Approve the input token if prompted, then confirm the swap.
+
+A token needs a pool with available liquidity for a trade to execute. Read
+[how swaps work](/swap) for fees, routing, and slippage, or explore
+[concentrated liquidity](/concentrated-liquidity) to provide liquidity yourself.
+
+## Launch a token on Arc Mainnet
+
+The [Biscotti token launchpad](/launchpad) creates a token and its USDC pool
+in one transaction. Each launch has a fixed supply of one billion tokens,
+with the liquidity positions held in a vault that has no withdrawal function.
+
+Choose a name, symbol, [launch curve](/launchpad/curves), and
+[creator fee mode](/launchpad/fees), then confirm the launch. The launch fee
+is 1 USDC plus gas. An opening buy is optional.
+
+## Mainnet and testnet availability
+
+| Product | Arc Mainnet (`5042`) | Arc Testnet (`5042002`) |
+| --- | --- | --- |
+| Concentrated liquidity and V3 swaps | Available | Available |
+| Token launchpad | Available | Available |
+| Stable pools | Planned | Available |
+| BSCT and farms | Planned | Available |
+
+Deployment details are maintained in [Contract Addresses](/developers/addresses)
+and the [Roadmap](/roadmap). To try the protocol with test tokens, follow the
+[Arc Testnet quick start](/quick-start).
+
+## Common questions
+
+### Do I need an ARC token to pay gas?
+
+Arc uses USDC for gas. You do not need BSCT to submit an Arc transaction.
+
+### Where can I find tokens on Arc?
+
+Start with [Arc tokens and contract addresses](/arc-tokens), then check the
+app's token and pool information for available markets.
+
+### Does using Biscotti qualify me for an Arc airdrop?
+
+Trading or launching a token does not establish eligibility for a separate
+reward program. Read [Arc airdrop questions and reward rules](/arc-airdrop)
+for the distinction between protocol rewards and airdrop announcements.
