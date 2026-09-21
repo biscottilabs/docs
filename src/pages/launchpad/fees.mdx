@@ -1,0 +1,49 @@
+---
+title: Launchpad Fees & Fee Modes
+description: What launching a token on the Biscotti Finance launchpad on Arc costs, how the 1% trading fee is split between creator and protocol, and the four creator fee modes.
+---
+
+# Fees & Fee Modes
+
+## Costs
+
+| Fee | Amount | Paid to |
+| --- | --- | --- |
+| Launch fee | 1 USDC, once | Protocol |
+| Trading fee | 1% of every trade | Split below |
+
+## Trading fee split
+
+| | Share of fees | Of trade volume |
+| --- | --- | --- |
+| Creator | 70% | 0.7% |
+| Protocol | 30% | 0.3% |
+
+`distributeFees(token)` pays both out. Anyone can call it.
+
+## Fee modes
+
+What happens to the creator's 70%:
+
+| Mode | Token-side fees | USDC-side fees |
+| --- | --- | --- |
+| **Payout** | To the creator | To the creator |
+| **Burn** | Burned | To the creator |
+| **Buyback & burn** | Burned | Buys the token back, then burns it |
+| **Holder rewards** | Burned | Streamed to holders over 24h |
+
+:::warning[Modes only move forward]
+Payout can move to any mode. Burn can move to the last two. Buyback & burn
+and Holder rewards are final.
+:::
+
+## Buyback guard
+
+A buyback is capped or skipped if the price was just pushed up by more than
+**5%** (Standard) or **20%** (Moon). Unspent USDC goes to the fee receiver.
+
+## Holder rewards
+
+- USDC streams to holders pro rata over **24 hours** after each payout.
+- Claim anytime: `claim(holder)` on the token's `HolderRewards` contract.
+- The pool, vault, router and burn addresses never earn.

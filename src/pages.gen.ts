@@ -20,6 +20,7 @@ type Page =
   | { path: '/connectkit/getting-started'; render: 'static' }
   | { path: '/connectkit'; render: 'static' }
   | { path: '/connectkit/sign-in-with-circle'; render: 'static' }
+  | { path: '/connectkit/siwe'; render: 'static' }
   | { path: '/connectkit/troubleshooting'; render: 'static' }
   | { path: '/developers/abis'; render: 'static' }
   | { path: '/developers/addresses'; render: 'static' }
@@ -34,6 +35,11 @@ type Page =
   | { path: '/farms/v3-farms'; render: 'static' }
   | { path: '/'; render: 'static' }
   | { path: '/introduction'; render: 'static' }
+  | { path: '/launchpad/contracts'; render: 'static' }
+  | { path: '/launchpad/curves'; render: 'static' }
+  | { path: '/launchpad/fees'; render: 'static' }
+  | { path: '/launchpad'; render: 'static' }
+  | { path: '/launchpad/safety'; render: 'static' }
   | { path: '/quick-start'; render: 'static' }
   | { path: '/roadmap'; render: 'static' }
   | { path: '/smart-router'; render: 'static' }

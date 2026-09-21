@@ -2,9 +2,10 @@ import { defineConfig } from 'vocs/config'
 
 export default defineConfig({
   title: 'Biscotti Finance',
-  titleTemplate: '%s – Biscotti Docs',
+  // Brand in every title: "Token Launchpad on Arc – Biscotti Finance".
+  titleTemplate: '%s – Biscotti Finance',
   description:
-    'Documentation for Biscotti Finance — a community-driven DEX on ARC with concentrated liquidity, stable pools, yield farms, coffee pools and on-chain trading battles.',
+    'Documentation for Biscotti Finance, the DEX and token launchpad on Arc Mainnet: launch tokens with locked liquidity, concentrated liquidity, stable pools, yield farms and trading battles.',
   baseUrl: 'https://docs.biscotti.finance',
   accentColor: 'light-dark(#8a4b26, #e0a370)',
   logoUrl: { light: '/logo-light.svg', dark: '/logo-dark.svg' },
@@ -21,6 +22,7 @@ export default defineConfig({
   ],
   topNav: [
     { text: 'Docs', link: '/introduction' },
+    { text: 'Launchpad', link: '/launchpad' },
     { text: 'ConnectKit', link: '/connectkit' },
     { text: 'Contracts', link: '/developers/addresses' },
     { text: 'App', link: 'https://biscotti.finance' },
@@ -42,6 +44,16 @@ export default defineConfig({
       items: [
         { text: 'Swaps', link: '/swap' },
         { text: 'Smart Router', link: '/smart-router' },
+      ],
+    },
+    {
+      text: 'Launchpad',
+      items: [
+        { text: 'Launch a Token', link: '/launchpad', badge: { text: 'mainnet', variant: 'info' } },
+        { text: 'Launch Curves', link: '/launchpad/curves' },
+        { text: 'Fees & Fee Modes', link: '/launchpad/fees' },
+        { text: 'Safety & Trust', link: '/launchpad/safety' },
+        { text: 'Contract Reference', link: '/launchpad/contracts' },
       ],
     },
     {

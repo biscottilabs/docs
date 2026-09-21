@@ -1,0 +1,116 @@
+---
+title: Launchpad Contract Reference
+description: Biscotti Finance launchpad contract addresses on Arc Mainnet and Arc Testnet, with the functions, events and examples needed to launch tokens or index launches.
+---
+
+# Launchpad Contracts
+
+## Arc Mainnet (`5042`)
+
+| Contract | Address |
+| --- | --- |
+| `BiscottiLaunchpad` (proxy) | `0x4703770e44CFfe4f2CC75Aa71D851f9bC59aDC8e` |
+| Implementation | `0x06a4a3909524406bAaa7726C35cc61D500bf05b2` |
+| `LaunchBuilder` (library) | `0xe567b2e980f4a133517967c98767491c8519d8dc` |
+| `LaunchTokenDeployer` | `0x65c8331E4f9E3Fa005bE9e634fA248BFc957b586` |
+| `LaunchPositionVault` | `0x5CAA9e6B8BB414aCbAFFAabdF3040968863cadBE` |
+| `LaunchFeeRouter` | `0xef4B743E4b350FFf232D64aB52658dB570394dB3` |
+| `HolderRewards` (implementation) | `0x46DCBFd72bE5811baECF11E3743D651896C8ABAa` |
+| Quote token (USDC) | `0x3600000000000000000000000000000000000000` |
+| USDC/USD feed (Chainlink) | `0x84EA90AC252Dc437031461836DB5164219147905` |
+
+Deployed at block `21927921`, on the [Biscotti V3 factory](/developers/addresses#concentrated-liquidity-v3).
+
+## Arc Testnet (`5042002`)
+
+| Contract | Address |
+| --- | --- |
+| `BiscottiLaunchpad` (proxy) | `0xDA67b7581aff02592B775C31273448AA8D5fF5a1` |
+| Implementation | `0x9105d747dA395455415833e7D4aF40e114e8064A` |
+| `LaunchTokenDeployer` | `0x98940C7cfaDeA42A2117D4F58F2CFa1463BCa9E2` |
+| `LaunchPositionVault` | `0x1c5e98BAa859cFa4D74FF70839fBa2828BD82F43` |
+| `LaunchFeeRouter` | `0x0126Ade7Ae0365ce24BF01d27f2367D5f86C19B8` |
+| `HolderRewards` (implementation) | `0x3a8CF9c0477e4cA44fA19bC805E2e00359C1cb98` |
+| USD feed (static, testnet only) | `0xD037d28DaA8A1CE687d25e84775528cD25163d8C` |
+
+Deployed at block `62763252`.
+
+## Functions
+
+| Function | Caller | Does |
+| --- | --- | --- |
+| `launch(config, quoteToken, liquidityMode, feeMode)` | Anyone, with `launchFee()` | Launches a token |
+| `launchAndBuy(config, quoteToken, liquidityMode, feeMode, buy)` | Anyone, with `launchFee()` | Launches, then buys first |
+| `distributeFees(token)` | Anyone | Pays out trading fees |
+| `setFeeMode(token, mode)` | Creator | Moves the fee mode forward |
+| `transferCreator(token, newCreator)` | Creator | Hands over the creator seat |
+| `launchOf(token)` | View | The launch record |
+| `positionIdsOf(token)` | View | LP positions held by the vault |
+| `launchFee()` | View | Launch fee in native USDC (18 decimals) |
+
+```solidity
+enum LiquidityMode { STANDARD, MOON }
+enum FeeMode { DIRECT_PAYOUT, BURN_TOKEN_FEES, BUYBACK_AND_BURN, HOLDER_REWARDS }
+struct TokenConfig { string name; string symbol; }
+struct OpeningBuy { uint256 amountIn; uint256 minTokensOut; address recipient; }
+```
+
+**Events:** `TokenLaunched`, `OpeningBuyExecuted`, `FeesDistributed`,
+`FeeModeChanged`.
+
+:::note[Opening buy approval]
+`launchAndBuy` pulls `buy.amountIn` of USDC with `transferFrom`. Approve the
+launchpad for that amount first.
+:::
+
+## Launch with viem
+
+```ts
+import { parseAbi } from 'viem'
+
+const launchpad = '0x4703770e44CFfe4f2CC75Aa71D851f9bC59aDC8e'
+const abi = parseAbi([
+  'function launchFee() view returns (uint256)',
+  'function launch((string name, string symbol) config, address quoteToken, uint8 liquidityMode, uint8 feeMode) payable returns (address token, address pool, uint256[] positionIds)',
+])
+
+// publicClient and walletClient configured for Arc Mainnet
+const fee = await publicClient.readContract({ address: launchpad, abi, functionName: 'launchFee' })
+
+await walletClient.writeContract({
+  address: launchpad,
+  abi,
+  functionName: 'launch',
+  args: [
+    { name: 'Coffee', symbol: 'COFFEE' },
+    '0x3600000000000000000000000000000000000000', // USDC
+    1, // MOON
+    0, // DIRECT_PAYOUT
+  ],
+  value: fee,
+})
+```
+
+## Read with cast
+
+```bash
+cast call 0x4703770e44CFfe4f2CC75Aa71D851f9bC59aDC8e \
+  "launchFee()(uint256)" --rpc-url https://rpc.mainnet.arc.io
+```
+
+## Subgraph
+
+| Network | Endpoint |
+| --- | --- |
+| Arc Mainnet | `https://api.studio.thegraph.com/query/1760536/launchpad/version/latest` |
+| Arc Testnet | `https://api.studio.thegraph.com/query/1754761/launchpad/version/latest` |
+
+```graphql
+{
+  launchTokens(first: 5, orderBy: createdAtTimestamp, orderDirection: desc) {
+    id
+    symbol
+    name
+  }
+}
+```

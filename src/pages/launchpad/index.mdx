@@ -1,0 +1,124 @@
+---
+title: Token Launchpad on Arc
+description: Launch a token on Arc with Biscotti Finance in one transaction. Fixed 1B supply, liquidity locked forever, no team allocation, a 1 USDC launch fee and 70% of trading fees to the creator.
+---
+
+<script
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'How do I launch a token on Arc?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Open the Biscotti Finance launchpad, enter a name and symbol, pick a liquidity curve and fee mode, and confirm one transaction. The token trades immediately.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How much does it cost to launch a token on Biscotti?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'A 1 USDC launch fee plus about 0.2 USDC of gas on Arc. An opening buy is optional.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Is the liquidity locked?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. Every liquidity position is held by a vault with no withdraw function, so the liquidity can never be pulled.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What does a token creator earn?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: "70% of the 1% trading fee on every trade of the token, handled by the creator's chosen fee mode.",
+          },
+        },
+      ],
+    }),
+  }}
+/>
+
+# Token Launchpad on Arc [Launch a token in one transaction]
+
+A name and a symbol become a live token on Arc, with its whole supply in the
+pool and the liquidity locked forever.
+
+[Launch a token ↗](https://biscotti.finance/launchpad/launch)
+
+## At a glance
+
+| | |
+| --- | --- |
+| Supply | **1,000,000,000**, fixed |
+| Liquidity | **100%** of supply in the pool, locked forever |
+| Team allocation | **0**. No presale, no hidden wallets |
+| Pool | 1% fee tier, paired with USDC |
+| Launch fee | **1 USDC** |
+| Creator earns | **70%** of trading fees |
+| Networks | Arc Mainnet · Arc Testnet |
+
+## Launch in four steps
+
+::::steps
+
+### Name it
+
+Name and symbol. Logo, description and links are optional.
+
+### Pick a curve
+
+Standard or Moon. See [Launch Curves](/launchpad/curves).
+
+### Choose a fee mode
+
+Payout, burn, buyback and burn, or holder rewards. See [Fees](/launchpad/fees).
+
+### Confirm
+
+One transaction. Add an opening buy to be the first buyer.
+
+::::
+
+:::tip[The first buy is yours]
+`launchAndBuy` launches and buys in the same transaction. No bot can buy
+before the creator.
+:::
+
+## Costs
+
+| | |
+| --- | --- |
+| Launch fee | 1 USDC |
+| Gas | ~0.2 USDC |
+| Opening buy | Optional, any amount |
+
+Keep about **1.3 USDC** in your wallet. The app sets gas aside before it lets
+you launch.
+
+## FAQ
+
+### Is the liquidity locked?
+
+Yes. A vault holds every position and has no withdraw function.
+[Safety](/launchpad/safety).
+
+### Can more tokens be minted?
+
+No. The token has no mint function after launch.
+
+### Who pays out the fees?
+
+Anyone. `distributeFees(token)` is permissionless.
+
+### Where are the contracts?
+
+[Contract reference](/launchpad/contracts).

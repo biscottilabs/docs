@@ -1,0 +1,37 @@
+---
+title: Launch Curves — Standard vs Moon
+description: How the Biscotti Finance launchpad on Arc places a new token's supply. One deep Standard position from a $5k valuation, or seven Moon bands from $10k.
+---
+
+# Launch Curves [Where the supply sits]
+
+The whole supply starts in the pool as sell-side liquidity above the launch
+price. Every buy moves the price up the curve.
+
+| | Standard | Moon |
+| --- | --- | --- |
+| Starts at | $5k valuation | $10k valuation |
+| Shape | One position up to the price ceiling | Seven bands |
+| Early price moves | Slower, deeper | Faster |
+
+## Moon bands
+
+| Valuation | Share of supply |
+| --- | --- |
+| $10k – $50k | 15% |
+| $50k – $100k | 10% |
+| $100k – $1M | 4% |
+| $1M – $5M | 5% |
+| $5M – $10M | 6% |
+| $10M – $100M | 10% |
+| $100M and up | 50% |
+
+## Priced in USD
+
+Valuations become a pool price through a USD price feed read at launch:
+Chainlink USDC/USD on Arc Mainnet.
+
+:::warning[Bad feed, no launch]
+A feed older than 3 days, a non-positive answer or an incomplete round
+reverts the launch instead of mispricing it.
+:::

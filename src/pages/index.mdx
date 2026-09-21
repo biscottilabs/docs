@@ -1,6 +1,6 @@
 ---
 title: Biscotti Finance
-description: The liquidity layer for ARC — trade, earn and build on open markets.
+description: Biscotti Finance is the liquidity layer and token launchpad on Arc Mainnet. Trade, launch tokens with locked liquidity, earn and build on open markets.
 layout: minimal
 content:
   width: full
@@ -259,6 +259,9 @@ outline: false
     transition: background .2s ease;
   }
 
+  #bsc-landing .bsc-feature-wide { grid-column: 1 / -1; }
+  #bsc-landing .bsc-feature-wide p { max-width: 520px; }
+
   #bsc-landing .bsc-feature:hover {
     background: color-mix(in srgb, var(--bsc-surface) 55%, transparent);
     text-decoration: none;
@@ -420,12 +423,38 @@ outline: false
   }
 `}</style>
 
+<script
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify({
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'Organization',
+          name: 'Biscotti Finance',
+          url: 'https://biscotti.finance',
+          logo: 'https://docs.biscotti.finance/icon-512.png',
+          sameAs: [
+            'https://x.com/biscottidex',
+            'https://github.com/biscottilabs',
+          ],
+        },
+        {
+          '@type': 'WebSite',
+          name: 'Biscotti Finance Docs',
+          url: 'https://docs.biscotti.finance',
+        },
+      ],
+    }),
+  }}
+/>
+
 <div id="bsc-landing">
 
   <section className="bsc-hero">
     <div className="bsc-eyebrow">
       <span className="bsc-status"></span>
-      Live on ARC Testnet · Chain 5042002
+      Live on Arc Mainnet · Chain 5042
     </div>
 
     <h1 className="bsc-title">
@@ -433,9 +462,9 @@ outline: false
     </h1>
 
     <p className="bsc-desc">
-      Biscotti is the open liquidity layer for ARC. Trade with intelligent
-      routing, deploy capital across precision markets, and build with
-      contracts designed for composability.
+      Biscotti is the open liquidity layer and token launchpad on Arc. Trade
+      with intelligent routing, launch tokens with liquidity locked forever,
+      and build with contracts designed for composability.
     </p>
 
     <div className="bsc-actions">
@@ -462,6 +491,13 @@ outline: false
     </div>
 
     <div className="bsc-bento">
+      <a className="bsc-feature bsc-feature-wide" href="/launchpad">
+        <span className="bsc-feature-number">NEW / LAUNCH</span>
+        <span className="bsc-feature-arrow">↗</span>
+        <h3>Token launchpad on Arc</h3>
+        <p>Launch a token in one transaction. Fixed supply, liquidity locked forever, no team allocation, and 70% of trading fees to the creator.</p>
+        <span className="bsc-wordmark">1B</span>
+      </a>
       <a className="bsc-feature" href="/concentrated-liquidity">
         <span className="bsc-feature-number">01 / PRECISION</span>
         <span className="bsc-feature-arrow">↗</span>

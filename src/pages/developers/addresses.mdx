@@ -1,18 +1,84 @@
 ---
-title: Contract Addresses
-description: All deployed Biscotti contract addresses on ARC Testnet. Mainnet coming soon.
+title: Contract Addresses — Arc Mainnet & Testnet
+description: Every Biscotti Finance contract address on Arc Mainnet (chain 5042) and Arc Testnet (chain 5042002). DEX, token launchpad, tokens, pools and price feeds.
 ---
 
 # Contract Addresses
 
-## ARC Testnet (chain ID `5042002`)
+Machine-readable copies: `deployments/arc-mainnet.json` and
+`deployments/arc-testnet.json` in the app repository.
 
-Machine-readable copy: `contract/deployments/arc-testnet.json` in the
-repository.
+## Arc Mainnet (chain ID `5042`)
+
+:::info[What's live]
+Concentrated liquidity (V3) and the [token launchpad](/launchpad). Stable
+pools, farms and BSCT are testnet-only for now.
+:::
 
 ### Tokens
 
+| Token | Address |
+| --- | --- |
+| USDC (native gas token) | `0x3600000000000000000000000000000000000000` |
+| EURC | `0xbEf5f6d51CB62b58e6A8f77868681825C6fe21c1` |
+| USYC | `0x8a5D989Bbb96929F689B0200f435f53dA42bF490` |
+| cirBTC (Circle Wrapped Bitcoin) | `0x171A4217b86A807A64eB94757Db6849fb4bDbAA0` |
+
+### Concentrated liquidity (V3)
+
 | Contract | Address |
+| --- | --- |
+| `UniswapV3Factory` | `0xC99C0D93a1B08fe2C6a5A0d544B8Bcb2eFe57dbe` |
+| `NonfungiblePositionManager` | `0x57376C04440345332B96C51EB66E532BcAF0e273` |
+| `SwapRouter` | `0x43e6b98403547e89700f95C6A799E1d76A660c17` |
+| `QuoterV2` | `0x01ec68bda88617b8ad430aeA0E0f8d398Ce5328c` |
+| `NonfungibleTokenPositionDescriptor` | `0xB0006d868d14449143d4a26673B545c280080Eb8` |
+| `NFTDescriptor` (library) | `0xF31D20b0ceBfD2FCa14505982cB77c7B27D5942C` |
+| `TickLens` | `0xBe704FbeEb70Ed4be86A92F5E086A59338506471` |
+| `UniswapInterfaceMulticall` | `0xB4Dd25eAbB84cb2f5Be8E8d96fc42B045F905562` |
+| WETH9 placeholder | `0x935D50A3523a514c1E8b475D1f846d898d0af3C6` |
+
+Pool init code hash: `0xe34f199b19b2b4f47f68442619d555527d244f78a3297ea89325f843f87b8b54`.
+Deployed at block `21927685`.
+
+:::note[No wrapped USDC]
+Arc has no wrapped native token. The WETH9 slot is a placeholder that reverts
+on every call, so USDC always moves as a plain ERC-20.
+:::
+
+### Launchpad
+
+| Contract | Address |
+| --- | --- |
+| `BiscottiLaunchpad` (proxy) | `0x4703770e44CFfe4f2CC75Aa71D851f9bC59aDC8e` |
+| `LaunchPositionVault` | `0x5CAA9e6B8BB414aCbAFFAabdF3040968863cadBE` |
+| `LaunchFeeRouter` | `0xef4B743E4b350FFf232D64aB52658dB570394dB3` |
+| `LaunchTokenDeployer` | `0x65c8331E4f9E3Fa005bE9e634fA248BFc957b586` |
+
+Full list: [Launchpad contracts](/launchpad/contracts).
+
+### Pools
+
+| Pool | Address |
+| --- | --- |
+| USDC/EURC 0.05% | `0x17B6fC67AABD2a301F85c8c4c80BCeE5Fa73A838` |
+| USDC/cirBTC 0.3% | `0xe4c116F7d95cD9b9B94fC9cfa8F2C962ba9DcC23` |
+
+### Price feeds (Chainlink)
+
+| Feed | Address |
+| --- | --- |
+| USDC/USD | `0x84EA90AC252Dc437031461836DB5164219147905` |
+| EURC/USD | `0x361b95c10b76Ca3f35C686d423e43A951755Bf23` |
+| BTC/USD | `0xa109B535C70C8Be9995be64Bb6751AcDB27e03De` |
+
+**Owner:** `0xAD1038f50068f5cB49D5fac2b56127c946D2e17d`
+
+## Arc Testnet (chain ID `5042002`)
+
+### Tokens
+
+| Token | Address |
 | --- | --- |
 | USDC (native gas token) | `0x3600000000000000000000000000000000000000` |
 | EURC | `0x89B50855Aa3bE2F677cD6303Cec089B5F319D72a` |
@@ -47,7 +113,16 @@ repository.
 
 | Contract | Address |
 | --- | --- |
-| `BiscottiSmartRouter` | See `deployments/arc-testnet.json` (redeployed with router updates) |
+| `BiscottiSmartRouter` (V3 + StableSwap) | `0xa95dF5a9cE06f15371bd0A68CdB91d960a871B5E` |
+
+### Launchpad
+
+| Contract | Address |
+| --- | --- |
+| `BiscottiLaunchpad` (proxy) | `0xDA67b7581aff02592B775C31273448AA8D5fF5a1` |
+| `LaunchPositionVault` | `0x1c5e98BAa859cFa4D74FF70839fBa2828BD82F43` |
+| `LaunchFeeRouter` | `0x0126Ade7Ae0365ce24BF01d27f2367D5f86C19B8` |
+| `LaunchTokenDeployer` | `0x98940C7cfaDeA42A2117D4F58F2CFa1463BCa9E2` |
 
 ### Farms & staking
 
@@ -67,16 +142,10 @@ repository.
 | --- | --- |
 | `RewardDistributor` (Trading Battles) | `0x3dfdaa44C15094d2D844bF3aCE9E8eE4F5F8332E` |
 
-### V3 pools
+### Pools
 
 | Pool | Address |
 | --- | --- |
 | USDC/EURC 0.05% | `0x6b15920Aec9700dFe3Ca2C25343059fbF91769A0` |
 
 **Deployer:** `0xC88c0cee526F894Ba9a70CD4F1879e6d345B69BC`
-
-## ARC Mainnet — coming soon 🚧
-
-Mainnet contracts will be published here at launch. Follow
-[@biscottidex](https://x.com/biscottidex) for the announcement, and see the
-[Roadmap](/roadmap) for timing.

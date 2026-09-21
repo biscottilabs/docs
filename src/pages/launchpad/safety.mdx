@@ -1,0 +1,33 @@
+---
+title: Launchpad Safety & Trust
+description: What the Biscotti Finance launchpad on Arc guarantees in code (locked liquidity, fixed supply, no team allocation) and the admin powers that remain.
+---
+
+# Safety & Trust
+
+## Guaranteed by the contracts
+
+| Guarantee | How |
+| --- | --- |
+| Liquidity can't be pulled | The vault holding every position has no withdraw or decrease function |
+| No team allocation | The whole supply is placed in the pool. Leftover dust is burned |
+| No new tokens | No mint function after launch |
+| No sniping the creator | The opening buy runs inside the launch transaction |
+| No mispriced launch | A stale or broken price feed reverts the launch |
+| Fees can't be frozen | A failed payout is credited and withdrawable later |
+
+## Admin powers
+
+Stated plainly, the launchpad owner **can**:
+
+- change the launch fee and the protocol's share,
+- change a launch's fee receiver,
+- upgrade the launchpad (UUPS proxy).
+
+The owner **cannot** withdraw liquidity, mint tokens or move a fee mode
+backwards. Ownership is a single key today and is moving to a multisig.
+
+:::warning[Locked is not the same as valuable]
+Locked liquidity means nobody can drain the pool. It says nothing about what
+a token is worth. Do your own research.
+:::
